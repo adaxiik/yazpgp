@@ -1,13 +1,18 @@
-#include "application.hpp"
-#include "logger.hpp"
-
-
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <glm/vec3.hpp>                 // glm::vec3
 #include <glm/vec4.hpp>                 // glm::vec4
 #include <glm/mat4x4.hpp>               // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
+
+#include "application.hpp"
+#include "logger.hpp"
+#include "shader.hpp"
+#include "renderable_entity.hpp"
+
+
+
 
 namespace yazpgp
 {
@@ -23,6 +28,10 @@ namespace yazpgp
     Application::~Application()
     {
         SDL_GL_DeleteContext(m_context);
+
+        SDL_DestroyWindow(m_window.get());
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        // SDL_Quit();
     }
 
     int Application::init_SDL()
@@ -32,6 +41,10 @@ namespace yazpgp
             YAZPGP_LOG_ERROR("SDL could not initialize! SDL_Error: %s", SDL_GetError());
             return 1;
         }
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetSwapInterval(1);
 
         m_window = { 
             SDL_CreateWindow(m_title.c_str(),
@@ -55,10 +68,24 @@ namespace yazpgp
             return 1;
         }
 
+        if (not glewInit() == GLEW_OK)
+        {
+            YAZPGP_LOG_ERROR("Failed to init glew");
+            return 1;
+        }
+
         YAZPGP_LOG_INFO("SDL initialized");
         YAZPGP_LOG_INFO("Resolution: %lux%lu", m_width, m_height);
 
         return 0;
+    }
+
+    double Application::frame()
+    {
+        SDL_GL_SwapWindow(m_window.get());
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        return 0.0;
     }
 
     int Application::run()
@@ -66,43 +93,48 @@ namespace yazpgp
         if (init_SDL())
             return 1;
 
+        auto triangle_shader = Shader::create_default_shader(1.f, 0.f, 0.f, 1.f);
+        if (not triangle_shader)
+            return 1;
 
-        glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
+        auto quad_shader = Shader::create_default_shader(0.f, 1.f, 0.f, 1.f);
+        if (not quad_shader)
+            return 1;
 
-        // Camera matrix
-        glm::mat4 biew = glm::lookAt(
-            glm::vec3(10, 10, 10), // Camera is at (4,3,-3), in World Space
-            glm::vec3(0, 0, 0),    // and looks at the origin
-            glm::vec3(0, 1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
-        );
-        // Model matrix : an identity matrix (model will be at the origin)
-        glm::mat4 model = glm::mat4(1.0f);
+
+        float tris[] = {
+            0.0f, 0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f
+        };
+
+        float quad[] = {
+            -0.1f, 0.1f, 0.0f,
+            0.1f, 0.1f, 0.0f,
+            0.1f, -0.1f, 0.0f,
+
+            -0.1f, 0.1f, 0.0f,
+            0.1f, -0.1f, 0.0f,
+            -0.1f, -0.1f, 0.0f
+        };
+
+        RenderableEntity triangle_entity(triangle_shader, std::make_shared<Mesh>(tris, sizeof(tris)));
+        RenderableEntity quad_entity(quad_shader, std::make_shared<Mesh>(quad, sizeof(quad)));
+
 
         bool running = true;
         while (running)
         {
+            // Ill move this to a separate class later.. trust me c:
             SDL_Event event;
             while (SDL_PollEvent(&event))
                 if (event.type == SDL_QUIT)
                     running = false;
+            
+            triangle_entity.render();
+            quad_entity.render();
 
-            glViewport(0, 0, m_width, m_height);
-            glClearColor(0.f, 0.f, 0.f, 0.f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-            glRotatef(SDL_GetTicks64()/1000.0 * 50.f, 0.f, 0.f, 1.f);
-
-            glBegin(GL_TRIANGLES);
-            glColor3f(1.f, 0.f, 0.f);
-            glVertex3f(-0.6f, -0.4f, 0.f);
-            glColor3f(0.f, 1.f, 0.f);
-            glVertex3f(0.6f, -0.4f, 0.f);
-            glColor3f(0.f, 0.f, 1.f);
-            glVertex3f(0.f, 0.6f, 0.f);
-            glEnd();
-            SDL_GL_SwapWindow(m_window.get());
+            (void)this->frame();
         }
 
         return 0;

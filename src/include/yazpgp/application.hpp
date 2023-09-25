@@ -16,6 +16,15 @@ namespace yazpgp
 
         int init_SDL();
 
+        /**
+         * @brief Update a window with OpenGL rendering and clears buffer
+         * 
+         * @note not yet :) ..
+         * 
+         * @return double Delta time in seconds
+         */
+        double frame();
+
     public:
         Application(const std::string& title, int64_t width, int64_t height);
         ~Application();

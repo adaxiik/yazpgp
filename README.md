@@ -4,5 +4,6 @@ Yet another ZPG project
 
 ## Libs
 - glm
-- glfw
+- sdl2
 - gl
+- glew

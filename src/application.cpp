@@ -28,8 +28,6 @@ namespace yazpgp
     Application::~Application()
     {
         SDL_GL_DeleteContext(m_context);
-
-        SDL_DestroyWindow(m_window.get());
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
         // SDL_Quit();
     }

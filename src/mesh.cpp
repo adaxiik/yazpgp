@@ -83,6 +83,7 @@ namespace yazpgp
     Mesh::~Mesh()
     {
         glDeleteBuffers(1, &m_vbo);
+        glDeleteBuffers(1, &m_ebo);
         glDeleteVertexArrays(1, &m_vao);
 
         YAZPGP_LOG_DEBUG("Mesh freed with vao: %d, ebo: %d", m_vao, m_ebo);

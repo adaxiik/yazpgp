@@ -10,6 +10,7 @@
 #include "logger.hpp"
 #include "shader.hpp"
 #include "renderable_entity.hpp"
+#include "io.hpp"
 
 #include "models/suzi_flat.h"
 
@@ -91,52 +92,58 @@ namespace yazpgp
         if (init_SDL())
             return 1;
 
-        auto triangle_shader = Shader::create_default_shader(1.f, 0.f, 0.f, 1.f);
-        if (not triangle_shader)
+        // auto triangle_shader = Shader::create_default_shader(1.f, 0.f, 0.f, 1.f);
+        // if (not triangle_shader)
+        //     return 1;
+
+        // auto quad_shader = Shader::create_default_shader(0.f, 1.f, 0.f, 1.f);
+        // if (not quad_shader)
+        //     return 1;
+
+        auto default_shader = io::load_shader_from_file("shaders/default/default.vs", "shaders/default/default.fs");
+        if (not default_shader)
             return 1;
 
-        auto quad_shader = Shader::create_default_shader(0.f, 1.f, 0.f, 1.f);
-        if (not quad_shader)
-            return 1;
 
+        // float tris[] = {
+        //     0.0f, 0.5f, 0.0f,
+        //     0.5f, -0.5f, 0.0f,
+        //     -0.5f, -0.5f, 0.0f
+        // };
 
-        float tris[] = {
-            0.0f, 0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f
-        };
+        // float quad[] = {
+        //     -0.1f, 0.1f, 0.0f,
+        //     0.1f, 0.1f, 0.0f,
+        //     0.1f, -0.1f, 0.0f,
 
-        float quad[] = {
-            -0.1f, 0.1f, 0.0f,
-            0.1f, 0.1f, 0.0f,
-            0.1f, -0.1f, 0.0f,
+        //     -0.1f, 0.1f, 0.0f,
+        //     0.1f, -0.1f, 0.0f,
+        //     -0.1f, -0.1f, 0.0f
+        // };
 
-            -0.1f, 0.1f, 0.0f,
-            0.1f, -0.1f, 0.0f,
-            -0.1f, -0.1f, 0.0f
-        };
+        // RenderableEntity triangle_entity(triangle_shader, std::make_shared<Mesh>(
+        //     tris, 
+        //     sizeof(tris),
+        //     VertexAttributeLayout({
+        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+        //     })));
 
-        RenderableEntity triangle_entity(triangle_shader, std::make_shared<Mesh>(
-            tris, 
-            sizeof(tris),
-            VertexAttributeLayout({
-                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-            })));
+        // RenderableEntity quad_entity(quad_shader, std::make_shared<Mesh>(
+        //     quad, 
+        //     sizeof(quad),
+        //     VertexAttributeLayout({
+        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+        //     })));
 
-        RenderableEntity quad_entity(quad_shader, std::make_shared<Mesh>(
-            quad, 
-            sizeof(quad),
-            VertexAttributeLayout({
-                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-            })));
-
-        RenderableEntity suzi_entity(quad_shader, std::make_shared<Mesh>(
-            suzi_flat_verts, 
-            sizeof(suzi_flat_verts),
-            VertexAttributeLayout({
-                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-            })));
+        // RenderableEntity suzi_entity(default_shader, std::make_shared<Mesh>(
+        //     suzi_flat_verts, 
+        //     sizeof(suzi_flat_verts),
+        //     VertexAttributeLayout({
+        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+        //     })));
+        auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
+        RenderableEntity suzi_entity(default_shader, suzi_mesh);
 
         bool running = true;
         while (running)
@@ -144,8 +151,21 @@ namespace yazpgp
             // Ill move this to a separate class later.. trust me c:
             SDL_Event event;
             while (SDL_PollEvent(&event))
+            {
                 if (event.type == SDL_QUIT)
                     running = false;
+                
+                if (event.type == SDL_WINDOWEVENT)
+                {
+                    if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+                    {
+                        m_width = event.window.data1;
+                        m_height = event.window.data2;
+                        glViewport(0, 0, m_width, m_height);
+                        YAZPGP_LOG_INFO("Resized to %lux%lu", m_width, m_height);
+                    }
+                }
+            }
             
             // triangle_entity.render();
             // quad_entity.render();

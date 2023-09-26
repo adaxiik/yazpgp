@@ -5,7 +5,20 @@
 namespace yazpgp
 {
     std::shared_ptr<Shader> Shader::create_shader(const std::string& vertex_shader, const std::string& fragment_shader)
-    {
+    { 
+
+        if (vertex_shader.empty())
+        {
+            YAZPGP_LOG_ERROR("Vertex shader source is empty");
+            return nullptr;
+        }
+
+        if (fragment_shader.empty())
+        {
+            YAZPGP_LOG_ERROR("Fragment shader source is empty");
+            return nullptr;
+        }
+
         const GLchar* very_unsafe_and_scary_vertex_source {&vertex_shader[0]};
         const GLchar* very_unsafe_and_scary_fragment_source {&fragment_shader[0]};
 

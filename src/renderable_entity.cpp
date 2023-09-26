@@ -12,6 +12,7 @@ namespace yazpgp
     {
         m_shader->use();
         m_mesh->use();
-        glDrawArrays(GL_TRIANGLES, 0, m_mesh->get_vert_count());
+        // glDrawArrays(GL_TRIANGLES, 0, m_mesh->get_vert_count());
+        glDrawElements(GL_TRIANGLES, m_mesh->get_index_count(), GL_UNSIGNED_INT, 0);
     }
 }

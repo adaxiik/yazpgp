@@ -20,3 +20,6 @@ add_executable(yazpgp src/main.cpp)
 target_include_directories(yazpgp PUBLIC ${YAZPGP_INCLUDE_DIRS_PREFIXED} ${YAZPGP_INCLUDE_DIRS})
 target_link_libraries(yazpgp yazpgp-lib)
 target_link_libraries(yazpgp SDL2 GL X11 GLEW assimp)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/models DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

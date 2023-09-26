@@ -7,3 +7,4 @@ Yet another ZPG project
 - sdl2
 - gl
 - glew
+- assimp

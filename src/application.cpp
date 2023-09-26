@@ -11,7 +11,7 @@
 #include "shader.hpp"
 #include "renderable_entity.hpp"
 
-
+#include "models/suzi_flat.h"
 
 
 namespace yazpgp
@@ -116,9 +116,27 @@ namespace yazpgp
             -0.1f, -0.1f, 0.0f
         };
 
-        RenderableEntity triangle_entity(triangle_shader, std::make_shared<Mesh>(tris, sizeof(tris)));
-        RenderableEntity quad_entity(quad_shader, std::make_shared<Mesh>(quad, sizeof(quad)));
+        RenderableEntity triangle_entity(triangle_shader, std::make_shared<Mesh>(
+            tris, 
+            sizeof(tris),
+            VertexAttributeLayout({
+                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+            })));
 
+        RenderableEntity quad_entity(quad_shader, std::make_shared<Mesh>(
+            quad, 
+            sizeof(quad),
+            VertexAttributeLayout({
+                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+            })));
+
+        RenderableEntity suzi_entity(quad_shader, std::make_shared<Mesh>(
+            suzi_flat_verts, 
+            sizeof(suzi_flat_verts),
+            VertexAttributeLayout({
+                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+            })));
 
         bool running = true;
         while (running)
@@ -129,8 +147,9 @@ namespace yazpgp
                 if (event.type == SDL_QUIT)
                     running = false;
             
-            triangle_entity.render();
-            quad_entity.render();
+            // triangle_entity.render();
+            // quad_entity.render();
+            suzi_entity.render();
 
             (void)this->frame();
         }

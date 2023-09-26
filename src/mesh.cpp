@@ -3,7 +3,8 @@
 
 namespace yazpgp
 {
-    Mesh::Mesh(const float* vertices, size_t size_bytes) : m_vert_count(size_bytes / sizeof(float) / 3)
+    Mesh::Mesh(const float* vertices, size_t size_bytes, const VertexAttributeLayout& layout)
+        : m_vert_count(size_bytes / layout.get_stride())
     {
         glGenBuffers(1, &m_vbo); 
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -11,10 +12,10 @@ namespace yazpgp
 
         glGenVertexArrays(1, &m_vao);
         glBindVertexArray(m_vao); 
-        glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
+        // glEnableVertexAttribArray(0);
+        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+        layout.use();
         YAZPGP_LOG_DEBUG("Mesh with %ld vertices and id %d created successfully", m_vert_count, m_vao);
     }
 

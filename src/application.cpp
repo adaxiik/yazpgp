@@ -1,10 +1,14 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include <glm/vec3.hpp>                 // glm::vec3
-#include <glm/vec4.hpp>                 // glm::vec4
-#include <glm/mat4x4.hpp>               // glm::mat4
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtc/type_ptr.hpp>         // glm::value_ptr
+#include <glm/vec3.hpp>                 
+#include <glm/vec4.hpp>                 
+#include <glm/mat4x4.hpp>               
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>         
+
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_sdl2.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
 
 #include "application.hpp"
 #include "logger.hpp"
@@ -18,23 +22,25 @@
 
 namespace yazpgp
 {
-    Application::Application(const std::string& title, int64_t width, int64_t height)
-        : m_window({nullptr, SDL_DestroyWindow})
-        , m_title(title)
-        , m_width(width)
-        , m_height(height) 
+    Application::Application(const ApplicationConfig& config)
+        : m_config(config)
+        , m_window({nullptr, SDL_DestroyWindow})
     {
 
     }
 
     Application::~Application()
     {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplSDL2_Shutdown();
+        ImGui::DestroyContext();
+        
         SDL_GL_DeleteContext(m_context);
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
         // SDL_Quit();
     }
 
-    int Application::init_SDL()
+    int Application::init_sdl()
     {
         if (SDL_Init(SDL_INIT_VIDEO) < 0)
         {
@@ -47,11 +53,11 @@ namespace yazpgp
         SDL_GL_SetSwapInterval(1);
 
         m_window = { 
-            SDL_CreateWindow(m_title.c_str(),
+            SDL_CreateWindow(m_config.title.c_str(),
                 SDL_WINDOWPOS_UNDEFINED,
                 SDL_WINDOWPOS_UNDEFINED,
-                m_width,
-                m_height,
+                m_config.width,
+                m_config.height,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL
             ), SDL_DestroyWindow };
 
@@ -69,12 +75,12 @@ namespace yazpgp
         }
 
         YAZPGP_LOG_INFO("SDL initialized");
-        YAZPGP_LOG_INFO("Resolution: %lux%lu", m_width, m_height);
+        YAZPGP_LOG_INFO("Resolution: %lux%lu", m_config.width, m_config.height);
 
         return 0;
     }
 
-    int Application::init_GL()
+    int Application::init_gl()
     {
         if (not glewInit() == GLEW_OK)
         {
@@ -87,23 +93,65 @@ namespace yazpgp
         glFrontFace(GL_CW);  
         glEnable(GL_DEPTH_TEST);
 
+        YAZPGP_LOG_INFO("Glew initialized");
+
+        return 0;
+    }
+
+    int Application::init_imgui()
+    {
+        IMGUI_CHECKVERSION();
+        if (not ImGui::CreateContext())
+        {
+            YAZPGP_LOG_ERROR("Failed to init imgui");
+            return 1;
+        }
+
+        // ImGuiIO& io = ImGui::GetIO();
+        ImGui::StyleColorsDark();
+
+        if (not ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_context))
+        {
+            YAZPGP_LOG_ERROR("Failed to init imgui sdl2");
+            return 1;
+        }
+
+        if (not ImGui_ImplOpenGL3_Init("#version 330"))
+        {
+            YAZPGP_LOG_ERROR("Failed to init imgui opengl3");
+            return 1;
+        }
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        YAZPGP_LOG_INFO("ImGui initialized");
         return 0;
     }
 
     double Application::frame()
     {
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(m_window.get());
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
         return 0.0;
     }
 
     int Application::run()
     {
-        if (init_SDL())
+        if (init_sdl())
             return 1;
 
-        if (init_GL())
+        if (init_gl())
+            return 1;
+
+        if (init_imgui())
             return 1;
 
         auto normal_shader = io::load_shader_from_file("shaders/normals/normals.vs", "shaders/normals/normals.fs");
@@ -160,7 +208,7 @@ namespace yazpgp
         auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
         RenderableEntity suzi_entity(normal_shader, suzi_mesh);
 
-        glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.1f, 100.0f);
+        glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
         glm::mat4 view_matrix = glm::lookAt(
             glm::vec3(0, 0, 5), 
             glm::vec3(0, 0, 0), 
@@ -178,26 +226,37 @@ namespace yazpgp
             {
                 if (event.type == SDL_QUIT)
                     running = false;
-                
+
                 if (event.type == SDL_WINDOWEVENT)
                 {
                     if (event.window.event == SDL_WINDOWEVENT_RESIZED)
                     {
-                        m_width = event.window.data1;
-                        m_height = event.window.data2;
-                        glViewport(0, 0, m_width, m_height);
-                        YAZPGP_LOG_INFO("Resized to %lux%lu", m_width, m_height);
+                        m_config.width = event.window.data1;
+                        m_config.height = event.window.data2;
+                        glViewport(0, 0,  m_config.width, m_config.height);
+                        YAZPGP_LOG_INFO("Resized to %lux%lu", m_config.width, m_config.height);
                     }
                 }
+                ImGui_ImplSDL2_ProcessEvent(&event);
             }
+            
+            ImGui::Begin("Suzi");
+            {
+                auto& transform = suzi_entity.transform();
+                ImGui::SliderFloat3("Position", glm::value_ptr(transform.position), -10.0f, 10.0f);
+                ImGui::SliderFloat3("Rotation", glm::value_ptr(transform.rotation), -180.0f, 180.0f);
+                ImGui::SliderFloat3("Scale", glm::value_ptr(transform.scale), 0.0f, 10.0f);
+            }
+            ImGui::End();
+
             
             // triangle_entity.render();
             // quad_entity.render();
             // sphere_entity.transform().rotation.y += 0.5f;
             // sphere_entity.render(view_projection_matrix);
-            suzi_entity.transform().rotation.y += 0.5f;
+     
             suzi_entity.render(view_projection_matrix);
-
+            
             (void)this->frame();
         }
 

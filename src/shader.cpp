@@ -2,6 +2,8 @@
 #include "logger.hpp"
 #include <memory>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace yazpgp
 {
     std::shared_ptr<Shader> Shader::create_shader(const std::string& vertex_shader, const std::string& fragment_shader)
@@ -81,5 +83,11 @@ namespace yazpgp
     {
         glDeleteProgram(m_program);
         YAZPGP_LOG_DEBUG("Shader program with id %d freed successfully", m_program);
+    }
+
+    void Shader::set_uniform(const std::string& name, glm::mat4 value) const
+    {
+        auto location = glGetUniformLocation(m_program, name.c_str());
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
     }
 }

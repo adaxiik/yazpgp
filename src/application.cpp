@@ -13,6 +13,7 @@
 #include "io.hpp"
 
 #include "models/suzi_flat.h"
+#include "models/sphere.h"
 
 
 namespace yazpgp
@@ -67,14 +68,24 @@ namespace yazpgp
             return 1;
         }
 
+        YAZPGP_LOG_INFO("SDL initialized");
+        YAZPGP_LOG_INFO("Resolution: %lux%lu", m_width, m_height);
+
+        return 0;
+    }
+
+    int Application::init_GL()
+    {
         if (not glewInit() == GLEW_OK)
         {
             YAZPGP_LOG_ERROR("Failed to init glew");
             return 1;
         }
 
-        YAZPGP_LOG_INFO("SDL initialized");
-        YAZPGP_LOG_INFO("Resolution: %lux%lu", m_width, m_height);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);  
+        glEnable(GL_DEPTH_TEST);
 
         return 0;
     }
@@ -92,16 +103,11 @@ namespace yazpgp
         if (init_SDL())
             return 1;
 
-        // auto triangle_shader = Shader::create_default_shader(1.f, 0.f, 0.f, 1.f);
-        // if (not triangle_shader)
-        //     return 1;
+        if (init_GL())
+            return 1;
 
-        // auto quad_shader = Shader::create_default_shader(0.f, 1.f, 0.f, 1.f);
-        // if (not quad_shader)
-        //     return 1;
-
-        auto default_shader = io::load_shader_from_file("shaders/default/default.vs", "shaders/default/default.fs");
-        if (not default_shader)
+        auto normal_shader = io::load_shader_from_file("shaders/normals/normals.vs", "shaders/normals/normals.fs");
+        if (not normal_shader)
             return 1;
 
 
@@ -135,15 +141,33 @@ namespace yazpgp
         //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
         //     })));
 
-        // RenderableEntity suzi_entity(default_shader, std::make_shared<Mesh>(
+        // RenderableEntity sphere_entity(normal_shader, std::make_shared<Mesh>(
+        //     sphere_verts, 
+        //     sizeof(sphere_verts),
+        //     VertexAttributeLayout({
+        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+        //     })));
+
+        // RenderableEntity suzi_entity(normal_shader, std::make_shared<Mesh>(
         //     suzi_flat_verts, 
         //     sizeof(suzi_flat_verts),
         //     VertexAttributeLayout({
         //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
         //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
         //     })));
+
         auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
-        RenderableEntity suzi_entity(default_shader, suzi_mesh);
+        RenderableEntity suzi_entity(normal_shader, suzi_mesh);
+
+        glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_width / (float)m_height, 0.1f, 100.0f);
+        glm::mat4 view_matrix = glm::lookAt(
+            glm::vec3(0, 0, 5), 
+            glm::vec3(0, 0, 0), 
+            glm::vec3(0, 1, 0)
+        );
+
+        auto view_projection_matrix = projection_matrix * view_matrix;
 
         bool running = true;
         while (running)
@@ -169,7 +193,10 @@ namespace yazpgp
             
             // triangle_entity.render();
             // quad_entity.render();
-            suzi_entity.render();
+            // sphere_entity.transform().rotation.y += 0.5f;
+            // sphere_entity.render(view_projection_matrix);
+            suzi_entity.transform().rotation.y += 0.5f;
+            suzi_entity.render(view_projection_matrix);
 
             (void)this->frame();
         }

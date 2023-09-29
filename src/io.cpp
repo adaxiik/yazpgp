@@ -48,7 +48,7 @@ namespace yazpgp
                 }
             }
 
-            std::vector<int> indices;
+            std::vector<uint32_t> indices;
             size_t estimated_index_data_size = 0;
             for (size_t i = 0; i < scene->mNumMeshes; i++)
                 estimated_index_data_size += scene->mMeshes[i]->mNumFaces * 3;
@@ -60,9 +60,9 @@ namespace yazpgp
                 const aiMesh* mesh = scene->mMeshes[i];
                 for (size_t j = 0; j < mesh->mNumFaces; j++)
                 {
-                    indices.push_back(mesh->mFaces[j].mIndices[0]);
-                    indices.push_back(mesh->mFaces[j].mIndices[1]);
                     indices.push_back(mesh->mFaces[j].mIndices[2]);
+                    indices.push_back(mesh->mFaces[j].mIndices[1]);
+                    indices.push_back(mesh->mFaces[j].mIndices[0]);
                 }
             }
             

@@ -15,6 +15,7 @@ namespace yazpgp
         int64_t m_height;
 
         int init_SDL();
+        int init_GL();
 
         /**
          * @brief Update a window with OpenGL rendering and clears buffer

@@ -68,7 +68,7 @@ namespace yazpgp
 
     void Mesh::use() const
     {
-        // glBindVertexArray(m_vao);
+        glBindVertexArray(m_vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     }
 

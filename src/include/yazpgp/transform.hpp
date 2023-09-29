@@ -22,5 +22,10 @@ namespace yazpgp
             model = glm::scale(model, scale);
             return model;
         }
+
+        static Transform default_transform()
+        {
+            return Transform();
+        }
     };
 }

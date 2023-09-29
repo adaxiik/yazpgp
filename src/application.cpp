@@ -16,6 +16,8 @@
 #include "renderable_entity.hpp"
 #include "io.hpp"
 
+#include "scene.hpp"
+
 #include "models/suzi_flat.h"
 #include "models/sphere.h"
 
@@ -205,8 +207,21 @@ namespace yazpgp
         //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
         //     })));
 
-        auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
-        RenderableEntity suzi_entity(normal_shader, suzi_mesh);
+        // auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
+        // RenderableEntity suzi_entity(normal_shader, suzi_mesh);
+
+        Scene scene({
+            {normal_shader, io::load_mesh_from_file("models/suzi.obj")},
+            {
+                normal_shader, std::make_shared<Mesh>(
+                sphere_verts, 
+                sizeof(sphere_verts),
+                VertexAttributeLayout({
+                    {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+                    {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+                }))
+            }
+        });
 
         glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
         glm::mat4 view_matrix = glm::lookAt(
@@ -239,24 +254,9 @@ namespace yazpgp
                 }
                 ImGui_ImplSDL2_ProcessEvent(&event);
             }
-            
-            ImGui::Begin("Suzi");
-            {
-                auto& transform = suzi_entity.transform();
-                ImGui::SliderFloat3("Position", glm::value_ptr(transform.position), -10.0f, 10.0f);
-                ImGui::SliderFloat3("Rotation", glm::value_ptr(transform.rotation), -180.0f, 180.0f);
-                ImGui::SliderFloat3("Scale", glm::value_ptr(transform.scale), 0.0f, 10.0f);
-            }
-            ImGui::End();
-
-            
-            // triangle_entity.render();
-            // quad_entity.render();
-            // sphere_entity.transform().rotation.y += 0.5f;
-            // sphere_entity.render(view_projection_matrix);
      
-            suzi_entity.render(view_projection_matrix);
-            
+            scene.render(view_projection_matrix);
+            scene.render_scene_imgui_panel();
             (void)this->frame();
         }
 

@@ -17,7 +17,7 @@ namespace yazpgp
         RenderableEntity(
             const std::shared_ptr<Shader>& shader,
             const std::shared_ptr<Mesh>& mesh,
-            const Transform& transform = Transform()
+            const Transform& transform = Transform::default_transform()
             );
         void render(const glm::mat4& view_projection_matrix) const;
         Transform& transform();

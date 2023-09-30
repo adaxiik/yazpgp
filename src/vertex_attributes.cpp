@@ -22,20 +22,18 @@ namespace yazpgp
 
     void VertexAttributeLayout::use() const
     {
-        // size_t offset = 0;
-        // for (size_t i = 0; i < m_attributes.size(); i++)
-        // {
-        //     const auto& attribute = m_attributes[i];
-        //     glVertexAttribPointer(i, attribute.size, attribute.type, attribute.normalized, m_stride, (void*)offset);
-        //     glEnableVertexAttribArray(i);
-        //     offset += attribute.size * sizeof(float);
-        // }
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)12);
-        glEnableVertexAttribArray(1);
-
-
+        size_t offset = 0;
+        for (size_t i = 0; i < m_attributes.size(); i++)
+        {
+            const auto& attribute = m_attributes[i];
+            glVertexAttribPointer(i, attribute.size, attribute.type, attribute.normalized, m_stride, (void*)offset);
+            glEnableVertexAttribArray(i);
+            offset += attribute.size * sizeof(float);
+        }
+        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        // glEnableVertexAttribArray(0);
+        // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)12);
+        // glEnableVertexAttribArray(1);
     }
 
     size_t VertexAttributeLayout::get_stride() const

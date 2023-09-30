@@ -29,7 +29,7 @@ namespace yazpgp
         : m_vert_count(vertices.size()), m_index_count(indices.size())
     {
 
-        static_assert(sizeof(Vertex) == 6 * sizeof(float));
+        static_assert(sizeof(Vertex) == 8 * sizeof(float));
         YAZPGP_LOG_FATAL_IF(m_vert_count * layout.get_stride() != vertices.size() * sizeof(Vertex), "Vertex size mismatch");
         std::unique_ptr<float[]> vertices_data = std::make_unique<float[]>(vertices.size() * layout.get_stride());
 

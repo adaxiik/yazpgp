@@ -32,8 +32,11 @@ namespace yazpgp
             size_t estimated_vertex_data_size = 0;
             for (size_t i = 0; i < scene->mNumMeshes; i++)
                 estimated_vertex_data_size += scene->mMeshes[i]->mNumVertices;
+
             
+            bool has_uvs = scene->mMeshes[0]->HasTextureCoords(0);
             vertex_data.reserve(estimated_vertex_data_size);
+
 
             for (size_t i = 0; i < scene->mNumMeshes; i++)
             {
@@ -46,7 +49,9 @@ namespace yazpgp
                         .z = mesh->mVertices[j].z,
                         .nx = mesh->mNormals[j].x,
                         .ny = mesh->mNormals[j].y,
-                        .nz = mesh->mNormals[j].z
+                        .nz = mesh->mNormals[j].z,
+                        .u = has_uvs ? mesh->mTextureCoords[0][j].x : 0.0f,
+                        .v = has_uvs ? mesh->mTextureCoords[0][j].y : 0.0f
                     });
                 }
             }
@@ -71,7 +76,8 @@ namespace yazpgp
             
             return std::make_shared<Mesh>(vertex_data, indices, VertexAttributeLayout({
                 {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+                {.size = 2, .type = GL_FLOAT, .normalized = GL_FALSE}
             }));
         }
     
@@ -97,6 +103,16 @@ namespace yazpgp
                 YAZPGP_LOG_ERROR("Error: %s", IMG_GetError());
                 return nullptr;
             }
+
+            // engineers in SDL couldn't add the most used function in image processing with opengl :))
+            for (int y = 0; y < surface->h / 2; y++)
+            {
+                char* top_row = static_cast<char*>(surface->pixels) + y * surface->pitch;
+                char* bottom_row = static_cast<char*>(surface->pixels) + (surface->h - y - 1) * surface->pitch;
+                for (int x = 0; x < surface->w * surface->format->BytesPerPixel; x++)
+                    std::swap(top_row[x], bottom_row[x]);
+            }
+
 
             auto texture =  std::make_shared<Texture>(
                 static_cast<const char*>(surface->pixels),

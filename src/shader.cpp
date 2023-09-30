@@ -28,24 +28,43 @@ namespace yazpgp
         glShaderSource(compiled_vertex_shader, 1, &very_unsafe_and_scary_vertex_source, NULL);
         glCompileShader(compiled_vertex_shader);
 
-        GLuint compiled_shader_shader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(compiled_shader_shader, 1, &very_unsafe_and_scary_fragment_source, NULL);
-        glCompileShader(compiled_shader_shader);
+        GLint success;
+        glGetShaderiv(compiled_vertex_shader, GL_COMPILE_STATUS, &success);
+        if (not success)
+        {
+            GLchar info_log[512];
+            glGetShaderInfoLog(compiled_vertex_shader, 512, NULL, info_log);
+            YAZPGP_LOG_ERROR("Failed to compile vertex shader: %s", info_log);
+            return nullptr;
+        }
+
+        GLuint compiled_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(compiled_fragment_shader, 1, &very_unsafe_and_scary_fragment_source, NULL);
+        glCompileShader(compiled_fragment_shader);
+
+        glGetShaderiv(compiled_fragment_shader, GL_COMPILE_STATUS, &success);
+        if (not success)
+        {
+            GLchar info_log[512];
+            glGetShaderInfoLog(compiled_fragment_shader, 512, NULL, info_log);
+            YAZPGP_LOG_ERROR("Failed to compile fragment shader: %s", info_log);
+            glDeleteShader(compiled_vertex_shader);
+            return nullptr;
+        }
 
         GLuint linked_shader_program = glCreateProgram();
-        glAttachShader(linked_shader_program, compiled_shader_shader);
+        glAttachShader(linked_shader_program, compiled_fragment_shader);
         glAttachShader(linked_shader_program, compiled_vertex_shader);
         glLinkProgram(linked_shader_program);
 
-        GLint status;
-        glGetProgramiv(linked_shader_program, GL_LINK_STATUS, &status);
-        if (status == GL_FALSE)
+        glGetProgramiv(linked_shader_program, GL_LINK_STATUS, &success);
+        if (not success)
         {
-            GLint info_log_length;
-            glGetProgramiv(linked_shader_program, GL_INFO_LOG_LENGTH, &info_log_length);
-            std::unique_ptr<GLchar> std_info_log = std::make_unique<GLchar>(info_log_length + 1);
-            glGetProgramInfoLog(linked_shader_program, info_log_length, NULL, std_info_log.get());
-            YAZPGP_LOG_ERROR("Linker failure: %s\n", std_info_log.get());
+            GLchar info_log[512];
+            glGetProgramInfoLog(linked_shader_program, 512, NULL, info_log);
+            YAZPGP_LOG_ERROR("Failed to link shader program: %s", info_log);
+            glDeleteShader(compiled_vertex_shader);
+            glDeleteShader(compiled_fragment_shader);
             return nullptr;
         }
 

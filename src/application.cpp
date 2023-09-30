@@ -147,7 +147,7 @@ namespace yazpgp
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(m_window.get());
-        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClearColor(0.09375, 0.09375, 0.09375, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -215,28 +215,48 @@ namespace yazpgp
         // auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
         // RenderableEntity suzi_entity(normal_shader, suzi_mesh);
 
-        auto rat_texure = io::load_texture_from_file("assets/textures/rat_diff.jpg");
-
+        auto rat_texture = io::load_texture_from_file("assets/textures/rat_diff.jpg");
+        auto backpack_texture = io::load_texture_from_file("assets/textures/backpack_diff.jpg");
+        
         auto normal_shader = io::load_shader_from_file(
             "assets/shaders/normals/normals.vs",
             "assets/shaders/normals/normals.fs"
         );
-
         if (not normal_shader)
             return 1;
 
+        auto textured_shader = io::load_shader_from_file(
+            "assets/shaders/textured/textured.vs",
+            "assets/shaders/textured/textured.fs"
+        );
+        if (not textured_shader)
+            return 1;
+
         Scene scene({
-            {normal_shader, io::load_mesh_from_file("assets/models/suzi.obj")},
-            {normal_shader, io::load_mesh_from_file("assets/models/rat.obj")},
-            {
-                normal_shader, std::make_shared<Mesh>(
-                sphere_verts, 
-                sizeof(sphere_verts),
-                VertexAttributeLayout({
-                    {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                    {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+            Scene::SceneRenderableEntity({
+                .shader =  normal_shader,
+                .mesh   = io::load_mesh_from_file("assets/models/suzi.obj")
+            }),
+            Scene::SceneRenderableEntity({
+                .shader = textured_shader,
+                .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
+                .textures = { rat_texture }
+            }),
+            Scene::SceneRenderableEntity({
+                .shader = textured_shader,
+                .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
+                .textures = { backpack_texture }
+            }),
+            Scene::SceneRenderableEntity({
+                .shader = normal_shader,
+                .mesh = std::make_shared<Mesh>(
+                    sphere_verts, 
+                    sizeof(sphere_verts),
+                    VertexAttributeLayout({
+                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
                 }))
-            }
+            })
         });
 
         glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);

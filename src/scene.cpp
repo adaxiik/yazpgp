@@ -11,7 +11,7 @@ namespace yazpgp
     Scene::Scene(const std::vector<SceneRenderableEntity>& entities)
     {
         for (const auto& entity : entities)
-            m_entities.push_back(std::make_unique<RenderableEntity>(entity.shader, entity.mesh));
+            m_entities.push_back(std::make_unique<RenderableEntity>(entity.shader, entity.mesh, entity.textures));
     }
 
     void Scene::render(const glm::mat4& view_projection_matrix) const

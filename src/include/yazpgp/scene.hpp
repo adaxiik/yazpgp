@@ -6,12 +6,13 @@ namespace yazpgp
 {
     class Scene
     {
+    public:
         struct SceneRenderableEntity
         {
             std::shared_ptr<Shader> shader;
             std::shared_ptr<Mesh> mesh;
+            std::vector<std::shared_ptr<Texture>> textures = {};
         };
-    public:
         Scene() = default;
         Scene(std::vector<std::unique_ptr<RenderableEntity>> entities);
         Scene(const std::vector<SceneRenderableEntity>& entities);

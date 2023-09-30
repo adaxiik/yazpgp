@@ -5,6 +5,9 @@
 #include <assimp/postprocess.h>
 #include <vector>
 #include <fstream>
+#include <SDL2/SDL_image.h>
+
+
 namespace yazpgp
 {
     namespace io
@@ -83,6 +86,27 @@ namespace yazpgp
                 return nullptr;
 
             return Shader::create_shader(vertex_source.value(), fragment_source.value());
+        }
+
+        std::shared_ptr<Texture> load_texture_from_file(const std::string& path)
+        {
+            SDL_Surface* surface = IMG_Load(path.c_str());
+            if (not surface)
+            {
+                YAZPGP_LOG_ERROR("Failed to load texture from file: %s", path.c_str());
+                YAZPGP_LOG_ERROR("Error: %s", IMG_GetError());
+                return nullptr;
+            }
+
+            auto texture =  std::make_shared<Texture>(
+                static_cast<const char*>(surface->pixels),
+                surface->w,
+                surface->h,
+                surface->format->BytesPerPixel
+            );
+
+            SDL_FreeSurface(surface);
+            return texture;
         }
 
 

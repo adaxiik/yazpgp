@@ -79,6 +79,10 @@ namespace yazpgp
         YAZPGP_LOG_INFO("SDL initialized");
         YAZPGP_LOG_INFO("Resolution: %lux%lu", m_config.width, m_config.height);
 
+        SDL_version sdl_compiled_version;
+        SDL_VERSION(&sdl_compiled_version);
+        YAZPGP_LOG_INFO("SDL version: %d.%d.%d", sdl_compiled_version.major, sdl_compiled_version.minor, sdl_compiled_version.patch);
+
         return 0;
     }
 
@@ -96,6 +100,12 @@ namespace yazpgp
         glEnable(GL_DEPTH_TEST);
 
         YAZPGP_LOG_INFO("Glew initialized");
+
+        YAZPGP_LOG_INFO("Using GLEW %s", glewGetString(GLEW_VERSION));
+        YAZPGP_LOG_INFO("OpenGL version: %s", glGetString(GL_VERSION));
+        YAZPGP_LOG_INFO("Vendor %s", glGetString(GL_VENDOR));
+        YAZPGP_LOG_INFO("Renderer %s", glGetString(GL_RENDERER));
+        YAZPGP_LOG_INFO("GLSL %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
         return 0;
     }
@@ -156,11 +166,6 @@ namespace yazpgp
         if (init_imgui())
             return 1;
 
-        auto normal_shader = io::load_shader_from_file("shaders/normals/normals.vs", "shaders/normals/normals.fs");
-        if (not normal_shader)
-            return 1;
-
-
         // float tris[] = {
         //     0.0f, 0.5f, 0.0f,
         //     0.5f, -0.5f, 0.0f,
@@ -210,8 +215,19 @@ namespace yazpgp
         // auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
         // RenderableEntity suzi_entity(normal_shader, suzi_mesh);
 
+        auto rat_texure = io::load_texture_from_file("assets/textures/rat_diff.jpg");
+
+        auto normal_shader = io::load_shader_from_file(
+            "assets/shaders/normals/normals.vs",
+            "assets/shaders/normals/normals.fs"
+        );
+
+        if (not normal_shader)
+            return 1;
+
         Scene scene({
-            {normal_shader, io::load_mesh_from_file("models/suzi.obj")},
+            {normal_shader, io::load_mesh_from_file("assets/models/suzi.obj")},
+            {normal_shader, io::load_mesh_from_file("assets/models/rat.obj")},
             {
                 normal_shader, std::make_shared<Mesh>(
                 sphere_verts, 

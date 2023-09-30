@@ -49,7 +49,7 @@ namespace yazpgp
             return nullptr;
         }
 
-        YAZPGP_LOG_DEBUG("Shader program created successfully with id: %d", linked_shader_program);
+        YAZPGP_LOG_DEBUG("Shader loaded with id: %d", linked_shader_program);
 
         return std::make_shared<Shader>(linked_shader_program);
     }
@@ -82,7 +82,7 @@ namespace yazpgp
     Shader::~Shader()
     {
         glDeleteProgram(m_program);
-        YAZPGP_LOG_DEBUG("Shader program with id %d freed successfully", m_program);
+        YAZPGP_LOG_DEBUG("Shader deleted id: %d", m_program);
     }
 
     void Shader::set_uniform(const std::string& name, glm::mat4 value) const

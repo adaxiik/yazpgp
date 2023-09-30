@@ -22,7 +22,7 @@ namespace yazpgp
 
         this->init_ebo(indices.data(), indices.size() * sizeof(uint32_t));
 
-        YAZPGP_LOG_DEBUG("Mesh created with vao: %d, ebo: %d, vert count: %lu and index count: %lu", m_vao, m_ebo, m_vert_count, m_index_count);
+        YAZPGP_LOG_DEBUG("Mesh loaded with vao: %d, ebo: %d, verts: %lu, indices: %lu, tris: %lu", m_vao, m_ebo, m_vert_count, m_index_count, m_index_count / 3);
     }
 
     Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const VertexAttributeLayout& layout)
@@ -40,7 +40,7 @@ namespace yazpgp
         layout.use();
         this->init_ebo(indices.data(), indices.size() * sizeof(uint32_t));
 
-        YAZPGP_LOG_DEBUG("Mesh created with vao: %d, ebo: %d, vert count: %lu and index count: %lu", m_vao, m_ebo, m_vert_count, m_index_count);
+        YAZPGP_LOG_DEBUG("Mesh loaded with vao: %d, ebo: %d, verts: %lu, indices: %lu, tris: %lu", m_vao, m_ebo, m_vert_count, m_index_count, m_index_count / 3);
     }
 
     void Mesh::init_vao()
@@ -88,6 +88,6 @@ namespace yazpgp
         glDeleteBuffers(1, &m_ebo);
         glDeleteVertexArrays(1, &m_vao);
 
-        YAZPGP_LOG_DEBUG("Mesh freed with vao: %d, ebo: %d", m_vao, m_ebo);
+        YAZPGP_LOG_DEBUG("Mesh deleted with vao: %d, ebo: %d", m_vao, m_ebo);
     }
 }

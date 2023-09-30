@@ -74,6 +74,18 @@ static const char* YAZPGP_LEVEL_COLORS[] = {
     } \
     } while (0)
 
+#define YAZPGP_LOG_INFO_IF(condition, fmt, ...) do { \
+    if (condition) { \
+        YAZPGP_LOG_INFO(fmt, ##__VA_ARGS__); \
+    } \
+    } while (0)
+
+#define YAZPGP_LOG_DEBUG_IF(condition, fmt, ...) do { \
+    if (condition) { \
+        YAZPGP_LOG_DEBUG(fmt, ##__VA_ARGS__); \
+    } \
+    } while (0)
+
 
 #define YAZPGP_WATCH(variable) do { \
         std::cout << #variable " = " << variable << " (" __FILE__ ", " __LINE__ ")" << std::endl; \

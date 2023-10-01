@@ -1,8 +1,9 @@
 #pragma once
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
+
 #include <memory>
 #include <string>
+
+#include "window.hpp"
 
 namespace yazpgp
 {
@@ -12,23 +13,17 @@ namespace yazpgp
         struct ApplicationConfig
         {
             std::string title;
-            int64_t width;
-            int64_t height;
+            uint32_t width;
+            uint32_t height;
         };
         Application(const ApplicationConfig& config);
-        ~Application();
+        ~Application() = default;
 
         int run();
 
     private:
         ApplicationConfig m_config;
-        std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> m_window;
-        SDL_GLContext m_context;
-
-        int init_sdl();
-        int init_gl();
-        int init_imgui();
-
+        std::unique_ptr<Window> m_window;
         /**
          * @brief Update a window with OpenGL rendering and clears buffer
          * 
@@ -37,7 +32,5 @@ namespace yazpgp
          * @return double Delta time in seconds
          */
         double frame();
-
-    
     };
 }

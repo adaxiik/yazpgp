@@ -4,11 +4,12 @@
 #include <glm/vec4.hpp>                 
 #include <glm/mat4x4.hpp>               
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>         
+#include <glm/gtc/type_ptr.hpp>
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_sdl2.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+
 
 #include "application.hpp"
 #include "logger.hpp"
@@ -26,129 +27,17 @@ namespace yazpgp
 {
     Application::Application(const ApplicationConfig& config)
         : m_config(config)
-        , m_window({nullptr, SDL_DestroyWindow})
+        , m_window(nullptr)
     {
 
-    }
-
-    Application::~Application()
-    {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplSDL2_Shutdown();
-        ImGui::DestroyContext();
-        
-        SDL_GL_DeleteContext(m_context);
-        SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        // SDL_Quit();
-    }
-
-    int Application::init_sdl()
-    {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0)
-        {
-            YAZPGP_LOG_ERROR("SDL could not initialize! SDL_Error: %s", SDL_GetError());
-            return 1;
-        }
-
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        SDL_GL_SetSwapInterval(1);
-
-        m_window = { 
-            SDL_CreateWindow(m_config.title.c_str(),
-                SDL_WINDOWPOS_UNDEFINED,
-                SDL_WINDOWPOS_UNDEFINED,
-                m_config.width,
-                m_config.height,
-                SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL
-            ), SDL_DestroyWindow };
-
-        if (not m_window)
-        {
-            YAZPGP_LOG_ERROR("Window could not be created! SDL_Error: %s", SDL_GetError());
-            return 1;
-        }
-
-        m_context = SDL_GL_CreateContext(m_window.get());
-        if (not m_context)
-        {
-            YAZPGP_LOG_ERROR("Context could not be created! SDL_Error: %s", SDL_GetError());
-            return 1;
-        }
-
-        YAZPGP_LOG_INFO("SDL initialized");
-        YAZPGP_LOG_INFO("Resolution: %lux%lu", m_config.width, m_config.height);
-
-        SDL_version sdl_compiled_version;
-        SDL_VERSION(&sdl_compiled_version);
-        YAZPGP_LOG_INFO("SDL version: %d.%d.%d", sdl_compiled_version.major, sdl_compiled_version.minor, sdl_compiled_version.patch);
-
-        return 0;
-    }
-
-    int Application::init_gl()
-    {
-        if (not glewInit() == GLEW_OK)
-        {
-            YAZPGP_LOG_ERROR("Failed to init glew");
-            return 1;
-        }
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glFrontFace(GL_CW);  
-        glEnable(GL_DEPTH_TEST);
-
-        YAZPGP_LOG_INFO("Glew initialized");
-
-        YAZPGP_LOG_INFO("Using GLEW %s", glewGetString(GLEW_VERSION));
-        YAZPGP_LOG_INFO("OpenGL version: %s", glGetString(GL_VERSION));
-        YAZPGP_LOG_INFO("Vendor %s", glGetString(GL_VENDOR));
-        YAZPGP_LOG_INFO("Renderer %s", glGetString(GL_RENDERER));
-        YAZPGP_LOG_INFO("GLSL %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-
-        return 0;
-    }
-
-    int Application::init_imgui()
-    {
-        IMGUI_CHECKVERSION();
-        if (not ImGui::CreateContext())
-        {
-            YAZPGP_LOG_ERROR("Failed to init imgui");
-            return 1;
-        }
-
-        // ImGuiIO& io = ImGui::GetIO();
-        ImGui::StyleColorsDark();
-
-        if (not ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_context))
-        {
-            YAZPGP_LOG_ERROR("Failed to init imgui sdl2");
-            return 1;
-        }
-
-        if (not ImGui_ImplOpenGL3_Init("#version 330"))
-        {
-            YAZPGP_LOG_ERROR("Failed to init imgui opengl3");
-            return 1;
-        }
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-        YAZPGP_LOG_INFO("ImGui initialized");
-        return 0;
     }
 
     double Application::frame()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(m_window.get());
-        glClearColor(0.09375, 0.09375, 0.09375, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_window->swap_buffers();
+        m_window->clear({0.1f, 0.1f, 0.1f});
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
@@ -157,13 +46,13 @@ namespace yazpgp
 
     int Application::run()
     {
-        if (init_sdl())
-            return 1;
+        m_window = Window::create({
+            .title = m_config.title,
+            .width = m_config.width,
+            .height = m_config.height,
+        });
 
-        if (init_gl())
-            return 1;
-
-        if (init_imgui())
+        if (not m_window)
             return 1;
 
         // float tris[] = {
@@ -233,21 +122,21 @@ namespace yazpgp
             return 1;
 
         Scene scene({
-            Scene::SceneRenderableEntity({
+            Scene::SceneRenderableEntity{
                 .shader =  normal_shader,
-                .mesh   = io::load_mesh_from_file("assets/models/suzi.obj")
-            }),
-            Scene::SceneRenderableEntity({
+                .mesh   = io::load_mesh_from_file("assets/models/m4.obj")
+            },
+            Scene::SceneRenderableEntity{
                 .shader = textured_shader,
                 .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
                 .textures = { rat_texture }
-            }),
-            Scene::SceneRenderableEntity({
+            },
+            Scene::SceneRenderableEntity{
                 .shader = textured_shader,
                 .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
                 .textures = { backpack_texture }
-            }),
-            Scene::SceneRenderableEntity({
+            },
+            Scene::SceneRenderableEntity{
                 .shader = normal_shader,
                 .mesh = std::make_shared<Mesh>(
                     sphere_verts, 
@@ -256,7 +145,7 @@ namespace yazpgp
                         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
                         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
                 }))
-            })
+            }
         });
 
         glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
@@ -268,28 +157,9 @@ namespace yazpgp
 
         auto view_projection_matrix = projection_matrix * view_matrix;
 
-        bool running = true;
-        while (running)
+        while (m_window->is_running())
         {
-            // Ill move this to a separate class later.. trust me c:
-            SDL_Event event;
-            while (SDL_PollEvent(&event))
-            {
-                if (event.type == SDL_QUIT)
-                    running = false;
-
-                if (event.type == SDL_WINDOWEVENT)
-                {
-                    if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-                    {
-                        m_config.width = event.window.data1;
-                        m_config.height = event.window.data2;
-                        glViewport(0, 0,  m_config.width, m_config.height);
-                        YAZPGP_LOG_INFO("Resized to %lux%lu", m_config.width, m_config.height);
-                    }
-                }
-                ImGui_ImplSDL2_ProcessEvent(&event);
-            }
+            m_window->pool_events();
      
             scene.render(view_projection_matrix);
             scene.render_scene_imgui_panel();

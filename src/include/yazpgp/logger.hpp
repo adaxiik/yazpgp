@@ -17,6 +17,7 @@
 #define YAZPGP_LOGGER_OUTPUT_STDOUT stdout
 #define YAZPGP_LOGGER_OUTPUT_STDERR stderr
 
+[[maybe_unused]]
 static const char* YAZPGP_LEVEL_STRINGS[] = {
     "[DEBUG]",
     "[INFO]",
@@ -25,6 +26,7 @@ static const char* YAZPGP_LEVEL_STRINGS[] = {
     "[FATAL]"
 };
 
+[[maybe_unused]]
 static const char* YAZPGP_LEVEL_COLORS[] = { 
     YAZPGP_LOGGER_COLOR_BLUE,
     YAZPGP_LOGGER_COLOR_GREEN,

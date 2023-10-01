@@ -68,6 +68,9 @@ namespace yazpgp
             return nullptr;
         }
 
+        glDeleteShader(compiled_vertex_shader);
+        glDeleteShader(compiled_fragment_shader);
+
         YAZPGP_LOG_DEBUG("Shader loaded with id: %d", linked_shader_program);
 
         return std::make_shared<Shader>(linked_shader_program);
@@ -104,7 +107,7 @@ namespace yazpgp
         YAZPGP_LOG_DEBUG("Shader deleted id: %d", m_program);
     }
 
-    void Shader::set_uniform(const std::string& name, glm::mat4 value) const
+    void Shader::set_uniform(const std::string& name, const glm::mat4& value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));

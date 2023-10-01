@@ -19,7 +19,7 @@ namespace yazpgp
         static std::shared_ptr<Shader> create_default_shader(float r = 1.f, float g = 0.f, float b = 0.f, float a = 1.f);
         void use() const;
 
-        void set_uniform(const std::string& name, glm::mat4 value) const;
+        void set_uniform(const std::string& name, const glm::mat4& value) const;
 
     };
 }

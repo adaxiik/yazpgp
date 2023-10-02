@@ -121,6 +121,7 @@ namespace yazpgp
         if (not textured_shader)
             return 1;
 
+        #if 0
         Scene scene({
             Scene::SceneRenderableEntity{
                 .shader =  normal_shader,
@@ -147,7 +148,30 @@ namespace yazpgp
                 }))
             }
         });
-
+        #else
+        Scene scene({
+            Scene::SceneRenderableEntity{
+                .shader = normal_shader,
+                .mesh = std::make_shared<Mesh>(
+                    sphere_verts, 
+                    sizeof(sphere_verts),
+                    VertexAttributeLayout({
+                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+                }))
+            },
+            Scene::SceneRenderableEntity{
+                .shader = normal_shader,
+                .mesh = std::make_shared<Mesh>(
+                    sphere_verts, 
+                    sizeof(sphere_verts),
+                    VertexAttributeLayout({
+                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+                }))
+            }
+        });
+        #endif
         glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
         glm::mat4 view_matrix = glm::lookAt(
             glm::vec3(0, 0, 5), 

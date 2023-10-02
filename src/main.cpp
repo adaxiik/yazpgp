@@ -9,5 +9,4 @@ int main(int argc, const char** argv)
         }
     );
     return app.run();
-    exit(EXIT_SUCCESS);
 }

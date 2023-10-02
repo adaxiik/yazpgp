@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <cstdlib>
 
 #define YAZPGP_LOGGER_LEVEL_DEBUG 0
 #define YAZPGP_LOGGER_LEVEL_INFO 1

@@ -121,11 +121,14 @@ namespace yazpgp
         if (not textured_shader)
             return 1;
 
-        #if 0
+        #if 1
         Scene scene({
             Scene::SceneRenderableEntity{
                 .shader =  normal_shader,
-                .mesh   = io::load_mesh_from_file("assets/models/m4.obj")
+                .mesh   = io::load_mesh_from_file("assets/models/m4.obj"),
+                .transform = Transform::default_transform()
+                                        .translate({-2.0f, 0.0f, -3.0f})
+                                        .rotate({0.0f, 80.0f, 0.0f})
             },
             Scene::SceneRenderableEntity{
                 .shader = textured_shader,
@@ -135,18 +138,21 @@ namespace yazpgp
             Scene::SceneRenderableEntity{
                 .shader = textured_shader,
                 .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
-                .textures = { backpack_texture }
+                .textures = { backpack_texture },
+                .transform = Transform::default_transform()
+                                        .translate({2.0f, 0.0f, -3.0f})
+                                        
             },
-            Scene::SceneRenderableEntity{
-                .shader = normal_shader,
-                .mesh = std::make_shared<Mesh>(
-                    sphere_verts, 
-                    sizeof(sphere_verts),
-                    VertexAttributeLayout({
-                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-                }))
-            }
+            // Scene::SceneRenderableEntity{
+            //     .shader = normal_shader,
+            //     .mesh = std::make_shared<Mesh>(
+            //         sphere_verts, 
+            //         sizeof(sphere_verts),
+            //         VertexAttributeLayout({
+            //             {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
+            //             {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
+            //     }))
+            // }
         });
         #else
         Scene scene({
@@ -184,6 +190,17 @@ namespace yazpgp
         while (m_window->is_running())
         {
             m_window->pool_events();
+
+            // for (auto& entity : scene)
+            // {
+            //     entity->transform() = Transform::Compositor::Composite({
+            //         Transform::Compositor::Rotate({0, 1, 0}),
+            //         Transform::Compositor::Composite({
+            //             Transform::Compositor::Translate({0, 0, -0.5}),
+            //             Transform::Compositor::Rotate({0, 1, 0})
+            //         })
+            //     })(entity->transform());
+            // }
      
             scene.render(view_projection_matrix);
             scene.render_scene_imgui_panel();

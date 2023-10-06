@@ -66,6 +66,11 @@ namespace yazpgp
         TYPE(Quit)
     };
 
+    struct KeyPressEvent
+    {
+        using Callback = std::function<void(const KeyPressEvent&)>;
+    };
+
     using EventCallback = std::variant<
         WindowResizeEvent::Callback,
         ScrollEvent::Callback,

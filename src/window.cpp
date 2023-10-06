@@ -148,8 +148,13 @@ namespace yazpgp
         return m_is_running;
     }
 
-    void Window::pool_events() const
+    void Window::pool_events()
     {
         m_input_manager.pool_events();
+    }
+
+    const InputManager& Window::input_manager() const
+    {
+        return m_input_manager;
     }
 }

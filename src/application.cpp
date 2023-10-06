@@ -9,6 +9,7 @@
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_sdl2.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <iostream>
 
 
 #include "application.hpp"
@@ -127,22 +128,21 @@ namespace yazpgp
                 .shader =  normal_shader,
                 .mesh   = io::load_mesh_from_file("assets/models/m4.obj"),
                 .transform = Transform::default_transform()
-                                        .translate({-2.0f, 0.0f, -3.0f})
-                                        .rotate({0.0f, 80.0f, 0.0f})
+                                        .translate({0.0f, 0.0f, -2.0f})
             },
-            Scene::SceneRenderableEntity{
-                .shader = textured_shader,
-                .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
-                .textures = { rat_texture }
-            },
-            Scene::SceneRenderableEntity{
-                .shader = textured_shader,
-                .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
-                .textures = { backpack_texture },
-                .transform = Transform::default_transform()
-                                        .translate({2.0f, 0.0f, -3.0f})
+            // Scene::SceneRenderableEntity{
+            //     .shader = textured_shader,
+            //     .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
+            //     .textures = { rat_texture }
+            // },
+            // Scene::SceneRenderableEntity{
+            //     .shader = textured_shader,
+            //     .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
+            //     .textures = { backpack_texture },
+            //     .transform = Transform::default_transform()
+            //                             .translate({2.0f, 0.0f, -3.0f})
                                         
-            },
+            // },
             // Scene::SceneRenderableEntity{
             //     .shader = normal_shader,
             //     .mesh = std::make_shared<Mesh>(
@@ -196,8 +196,8 @@ namespace yazpgp
             //     entity->transform() = Transform::Compositor::Composite({
             //         Transform::Compositor::Rotate({0, 1, 0}),
             //         Transform::Compositor::Composite({
-            //             Transform::Compositor::Translate({0, 0, -0.5}),
-            //             Transform::Compositor::Rotate({0, 1, 0})
+            //             Transform::Compositor::Translate({0, 0, 0.1}),
+            //             Transform::Compositor::Rotate({0, 1, 0}),
             //         })
             //     })(entity->transform());
             // }

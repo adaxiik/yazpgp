@@ -29,7 +29,8 @@ namespace yazpgp
         void clear(glm::vec3 color);
         bool is_running() const;
 
-        void pool_events() const;
+        void pool_events();
+        const InputManager& input_manager() const;
 
     private:
         WindowConfig m_config;

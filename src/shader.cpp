@@ -81,11 +81,11 @@ namespace yazpgp
         const std::string default_vertex_shader =
             "#version 330\n"
             "layout(location=0) in vec3 vp;"
+            "uniform mat4 mvp;"
             "void main () {"
-            "     gl_Position = vec4 (vp, 1.0);"
+            "     gl_Position = mvp * vec4 (vp, 1.0);"
             "}";
 
-            
 
         const std::string default_fragment_shader =
             "#version 330\n"

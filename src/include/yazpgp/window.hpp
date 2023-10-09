@@ -30,7 +30,9 @@ namespace yazpgp
         bool is_running() const;
 
         void pool_events();
-        const InputManager& input_manager() const;
+        InputManager& input_manager();
+        void set_relative_mouse_mode(bool enabled) const;
+        double delta_time() const;
 
     private:
         WindowConfig m_config;
@@ -38,5 +40,6 @@ namespace yazpgp
         SDL_GLContext m_context;
         InputManager m_input_manager;
         bool m_is_running;
+        double m_delta_time;
     };
 }

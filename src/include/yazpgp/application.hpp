@@ -24,13 +24,6 @@ namespace yazpgp
     private:
         ApplicationConfig m_config;
         std::unique_ptr<Window> m_window;
-        /**
-         * @brief Update a window with OpenGL rendering and clears buffer
-         * 
-         * @note not yet :) ..
-         * 
-         * @return double Delta time in seconds
-         */
-        double frame();
+        void frame();
     };
 }

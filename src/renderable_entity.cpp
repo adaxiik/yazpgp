@@ -22,7 +22,7 @@ namespace yazpgp
     void RenderableEntity::render(const glm::mat4& view_projection_matrix) const
     {
         m_shader->use();
-        m_shader->set_uniform("mvp", view_projection_matrix * m_transform.matrix());
+        m_shader->set_uniform("mvp", view_projection_matrix * m_transform.model_matrix());
         for (size_t i = 0; i < m_textures.size(); i++)
             m_textures[i]->use(i);
 

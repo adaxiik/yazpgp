@@ -111,6 +111,10 @@ namespace yazpgp
 
     void Window::swap_buffers()
     {
+        static double last_time = SDL_GetTicks();
+        double current_time = SDL_GetTicks();
+        m_delta_time = (current_time - last_time) / 1000.0;
+        last_time = current_time;
         SDL_GL_SwapWindow(m_window.get());
     }
 
@@ -135,6 +139,10 @@ namespace yazpgp
         , m_is_running(true)
     {
         m_input_manager.add_listener(QuitEvent::Callback{[this](auto) { m_is_running = false; }});
+
+        m_input_manager.add_listener(WindowResizeEvent::Callback{[this](WindowResizeEvent event) {
+            glViewport(0, 0, event.width, event.height);
+        }});
     }
 
     void Window::clear(glm::vec3 color)
@@ -153,8 +161,18 @@ namespace yazpgp
         m_input_manager.pool_events();
     }
 
-    const InputManager& Window::input_manager() const
+    InputManager& Window::input_manager()
     {
         return m_input_manager;
+    }
+
+    void Window::set_relative_mouse_mode(bool enabled) const
+    {
+        SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
+    }
+
+    double Window::delta_time() const
+    {
+        return m_delta_time;
     }
 }

@@ -23,6 +23,7 @@
 #include "models/suzi_flat.h"
 #include "models/sphere.h"
 
+#include "camera.hpp"
 
 namespace yazpgp
 {
@@ -33,7 +34,7 @@ namespace yazpgp
 
     }
 
-    double Application::frame()
+    void Application::frame()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -42,7 +43,6 @@ namespace yazpgp
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-        return 0.0;
     }
 
     int Application::run()
@@ -119,22 +119,29 @@ namespace yazpgp
             "assets/shaders/textured/textured.vs",
             "assets/shaders/textured/textured.fs"
         );
+
         if (not textured_shader)
             return 1;
+        
+        auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
 
         #if 1
         Scene scene({
             Scene::SceneRenderableEntity{
-                .shader =  normal_shader,
-                .mesh   = io::load_mesh_from_file("assets/models/m4.obj"),
-                .transform = Transform::default_transform()
-                                        .translate({0.0f, 0.0f, -2.0f})
+                .shader = textured_shader,
+                .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
+                .textures = { rat_texture }
             },
-            // Scene::SceneRenderableEntity{
-            //     .shader = textured_shader,
-            //     .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
-            //     .textures = { rat_texture }
-            // },
+            Scene::SceneRenderableEntity{
+                .shader = white_shader,
+                .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
+            },
+            Scene::SceneRenderableEntity{
+                .shader = white_shader,
+                .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
+                .transform = Transform::default_transform()
+                                        .translate({0.0f, 5.0f,0.0f})
+            },
             // Scene::SceneRenderableEntity{
             //     .shader = textured_shader,
             //     .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
@@ -178,33 +185,66 @@ namespace yazpgp
             }
         });
         #endif
-        glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f), (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
-        glm::mat4 view_matrix = glm::lookAt(
-            glm::vec3(0, 0, 5), 
-            glm::vec3(0, 0, 0), 
-            glm::vec3(0, 1, 0)
+
+        const float fov = glm::radians(60.0f);
+        glm::mat4 projection_matrix = glm::perspective(fov, (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
+        
+        m_window->input_manager().add_listener(
+            WindowResizeEvent::Callback{[&](WindowResizeEvent event) {  
+                projection_matrix = glm::perspective(
+                    fov, 
+                    (float)event.width / (float)event.height, 
+                    0.1f, 
+                    100.0f
+                );
+            }}
         );
 
-        auto view_projection_matrix = projection_matrix * view_matrix;
+        m_window->input_manager().add_listener(
+            KeyDownEvent::Callback{[&](KeyDownEvent event) {
+                static bool mouse_locked = false;
+                if (event.key == Key::ESCAPE)
+                {
+                    mouse_locked = !mouse_locked;
+                    m_window->set_relative_mouse_mode(mouse_locked);
+                }
+            }}
+        );
+
+        Camera camera(glm::vec3(-3, 0.3, 0));
+
 
         while (m_window->is_running())
         {
             m_window->pool_events();
-
+            camera.update(m_window->input_manager(), m_window->delta_time());
+            auto view_projection_matrix = projection_matrix * camera.view_matrix();
+          
             // for (auto& entity : scene)
             // {
             //     entity->transform() = Transform::Compositor::Composite({
-            //         Transform::Compositor::Rotate({0, 1, 0}),
-            //         Transform::Compositor::Composite({
-            //             Transform::Compositor::Translate({0, 0, 0.1}),
             //             Transform::Compositor::Rotate({0, 1, 0}),
-            //         })
-            //     })(entity->transform());
+            //             Transform::Compositor::Composite({
+            //                 Transform::Compositor::Translate({0, 0, 0.1}),
+            //                 Transform::Compositor::Rotate({0, 1, 0}),
+            //             })
+            //         })(entity->transform());
+            //     if (m_window->input_manager().get_key(Key::A))
+            //         entity->transform().rotate({0,1,0});
+                
+            //     if (m_window->input_manager().get_key(Key::D))
+            //         entity->transform().rotate({0,-1,0});// if (m_window->input_manager().get_key(Key::D))
+            //         entity->transform().rotate({0,-1,0});
+
             // }
+
+            ImGui::Begin("Info");
+            ImGui::Text("FPS: %f", 1.0f / m_window->delta_time());
+            ImGui::End();
      
             scene.render(view_projection_matrix);
             scene.render_scene_imgui_panel();
-            (void)this->frame();
+            this->frame();
         }
 
         return 0;

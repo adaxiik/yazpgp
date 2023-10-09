@@ -5,6 +5,8 @@
 #include <variant>
 #include <cstdint>
 
+#include "keys.hpp"
+
 namespace yazpgp
 {
 
@@ -32,12 +34,15 @@ namespace yazpgp
         WindowResize,
         Scroll,
         Quit,
-
+        KeyDown,
+        KeyUp,
+        Input,
+        
         COUNT
     };
 
     #define TYPE(X) \
-        constexpr static EventType type = EventType::X;
+        constexpr static EventType type = EventType::X
 
     
     struct WindowResizeEvent
@@ -46,7 +51,7 @@ namespace yazpgp
         uint32_t height;
         using Callback = std::function<void(const WindowResizeEvent&)>;
 
-        TYPE(WindowResize)
+        TYPE(WindowResize);
     };
 
 
@@ -56,29 +61,62 @@ namespace yazpgp
         int y_offset;
         using Callback = std::function<void(const ScrollEvent&)>;
 
-        TYPE(Scroll)
+        TYPE(Scroll);
     };
 
     struct QuitEvent
     {
         using Callback = std::function<void(const QuitEvent&)>;
 
-        TYPE(Quit)
+        TYPE(Quit);
     };
 
-    struct KeyPressEvent
+    struct KeyDownEvent
     {
-        using Callback = std::function<void(const KeyPressEvent&)>;
+        Key key;
+        using Callback = std::function<void(const KeyDownEvent&)>;
+        TYPE(KeyDown);
     };
 
-    using EventCallback = std::variant<
-        WindowResizeEvent::Callback,
-        ScrollEvent::Callback,
-        QuitEvent::Callback>;
-        
+    struct KeyUpEvent
+    {
+        Key key;
+        using Callback = std::function<void(const KeyUpEvent&)>;
+        TYPE(KeyUp);
+    };
+
+    class InputManager;
+    struct InputEvent
+    {
+        InputManager& input_manager;
+        using Callback = std::function<void(const InputEvent&)>;
+        TYPE(Input);
+    };
+
+    struct WhileKeyIsDownEvent
+    {
+        Key key;
+        using Callback = std::function<void(const WhileKeyIsDownEvent&)>;
+    };
+    
+
     using Event = std::variant<WindowResizeEvent,
         ScrollEvent,
-        QuitEvent>;
+        QuitEvent,
+        KeyDownEvent,
+        KeyUpEvent,
+        InputEvent>;
+
+    
+    template <typename EventVariant>
+    struct CreateEventCallbackVariant;
+
+    template <typename... EventTypes>
+    struct CreateEventCallbackVariant<std::variant<EventTypes...>> {
+        using type = std::variant<typename EventTypes::Callback...>;
+    };
+    using EventCallback = typename CreateEventCallbackVariant<Event>::type;
+
 
     static_assert(std::variant_size_v<EventCallback> == std::variant_size_v<Event>);
     static_assert(static_cast<size_t>(EventType::COUNT) == std::variant_size_v<Event>);

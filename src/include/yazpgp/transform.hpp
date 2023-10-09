@@ -11,7 +11,7 @@ namespace yazpgp
         glm::mat4 m_matrix;
 
     public:
-        const glm::mat4 &matrix() const
+        const glm::mat4 &model_matrix() const
         {
             return m_matrix;
         }

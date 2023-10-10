@@ -81,9 +81,10 @@ namespace yazpgp
         const std::string default_vertex_shader =
             "#version 330\n"
             "layout(location=0) in vec3 vp;"
-            "uniform mat4 mvp;"
+            "uniform mat4 view_projection_matrix;"
+            "uniform mat4 mvp_matrix;"
             "void main () {"
-            "     gl_Position = mvp * vec4 (vp, 1.0);"
+            "     gl_Position = mvp_matrix * vec4 (vp, 1.0);"
             "}";
 
 

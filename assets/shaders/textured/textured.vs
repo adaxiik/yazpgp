@@ -5,10 +5,11 @@ layout(location=2) in vec2 vertex_texcoord;
 out vec3 vs_normal;
 out vec2 vs_texcoord;
 
-uniform mat4 mvp;
+uniform mat4 mvp_matrix;
+uniform mat4 model_matrix;
 
 void main () {
-    gl_Position = mvp * vec4(vertex_position, 1.0);
+    gl_Position = mvp_matrix * vec4(vertex_position, 1.0);
     vs_normal = vertex_normal;
     vs_texcoord = vertex_texcoord;
 }

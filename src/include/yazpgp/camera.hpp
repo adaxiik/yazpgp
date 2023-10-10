@@ -2,11 +2,12 @@
 #include <glm/glm.hpp>
 
 #include "input_manager.hpp"
-
+#include "event_source.hpp"
 namespace yazpgp
 {
     class Camera
     {
+        glm::mat4 m_view_matrix;
         glm::vec3 m_position;
         const glm::vec3 m_up;
         
@@ -22,6 +23,8 @@ namespace yazpgp
         void move_right(float distance);
         void move_up(float distance);
 
+        glm::mat4 compute_view_matrix() const;
+
     public:
         Camera(
             glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -31,8 +34,7 @@ namespace yazpgp
             float phi_deg = 0.0f,
             glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f)
         );
-        glm::mat4 view_matrix() const;
-
+        const glm::mat4& view_matrix() const;
         void update(const InputManager& input, float delta_time);
     };
 }

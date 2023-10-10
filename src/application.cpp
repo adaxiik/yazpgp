@@ -186,14 +186,26 @@ namespace yazpgp
         });
         #endif
 
-        const float fov = glm::radians(60.0f);
+        float fov = 60.0f;
         glm::mat4 projection_matrix = glm::perspective(fov, (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
         
         m_window->input_manager().add_listener(
             WindowResizeEvent::Callback{[&](WindowResizeEvent event) {  
                 projection_matrix = glm::perspective(
-                    fov, 
+                    glm::radians(fov), 
                     (float)event.width / (float)event.height, 
+                    0.1f, 
+                    100.0f
+                );
+            }}
+        );
+
+        m_window->input_manager().add_listener(
+            ScrollEvent::Callback{[&](ScrollEvent event) {
+                fov -= event.y_offset * 2;
+                projection_matrix = glm::perspective(
+                    glm::radians(fov),
+                    (float)m_config.width / (float)m_config.height, 
                     0.1f, 
                     100.0f
                 );
@@ -211,39 +223,11 @@ namespace yazpgp
             }}
         );
 
-        Camera camera(glm::vec3(-3, 0.3, 0));
-
-
         while (m_window->is_running())
         {
             m_window->pool_events();
-            camera.update(m_window->input_manager(), m_window->delta_time());
-            auto view_projection_matrix = projection_matrix * camera.view_matrix();
-          
-            // for (auto& entity : scene)
-            // {
-            //     entity->transform() = Transform::Compositor::Composite({
-            //             Transform::Compositor::Rotate({0, 1, 0}),
-            //             Transform::Compositor::Composite({
-            //                 Transform::Compositor::Translate({0, 0, 0.1}),
-            //                 Transform::Compositor::Rotate({0, 1, 0}),
-            //             })
-            //         })(entity->transform());
-            //     if (m_window->input_manager().get_key(Key::A))
-            //         entity->transform().rotate({0,1,0});
-                
-            //     if (m_window->input_manager().get_key(Key::D))
-            //         entity->transform().rotate({0,-1,0});// if (m_window->input_manager().get_key(Key::D))
-            //         entity->transform().rotate({0,-1,0});
-
-            // }
-
-            ImGui::Begin("Info");
-            ImGui::Text("FPS: %f", 1.0f / m_window->delta_time());
-            ImGui::End();
-     
-            scene.render(view_projection_matrix);
-            scene.render_scene_imgui_panel();
+            scene.update(m_window->input_manager(), m_window->delta_time());
+            scene.render(projection_matrix);
             this->frame();
         }
 

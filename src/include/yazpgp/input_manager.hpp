@@ -23,6 +23,9 @@ namespace yazpgp
         int m_mouse_y;
         int m_mouse_delta_x;
         int m_mouse_delta_y;
+
+        int m_mouse_scroll_x;
+        int m_mouse_scroll_y;
     public:
         InputManager();
         void add_listener(const EventCallback& callback);

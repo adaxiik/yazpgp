@@ -85,8 +85,9 @@ namespace yazpgp
                 {
                     dispatch(ScrollEvent{
                         .x_offset = event.wheel.x,
-                        .y_offset = event.wheel.y
+                        .y_offset = event.wheel.y,
                     });
+
                     break;
                 }
                 case SDL_KEYDOWN:

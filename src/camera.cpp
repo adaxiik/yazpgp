@@ -40,7 +40,12 @@ namespace yazpgp
         );
     }
 
-    glm::mat4 Camera::view_matrix() const
+    const glm::mat4& Camera::view_matrix() const
+    {
+        return m_view_matrix;
+    }
+
+    glm::mat4 Camera::compute_view_matrix() const
     {
         return glm::lookAt(m_position, m_position + target(), m_up);
     }
@@ -79,22 +84,48 @@ namespace yazpgp
         if (input.get_key(Key::LSHIFT))
             m_speed *= 2.0f;
 
+        bool updated = false;
+
         if (input.get_key(Key::W))
+        {
             move_forward(m_speed * delta_time);
+            updated = true;
+        }
         if (input.get_key(Key::S))
+        {
             move_forward(-m_speed * delta_time);
+            updated = true;
+        }
         if (input.get_key(Key::D))
+        {
             move_right(m_speed * delta_time);
+            updated = true;
+        }
         if (input.get_key(Key::A))
+        {
             move_right(-m_speed * delta_time);
+            updated = true;
+        }
         if (input.get_key(Key::E))
+        {
             move_up(m_speed * delta_time);
+            updated = true;
+        }
         if (input.get_key(Key::Q))
+        {
             move_up(-m_speed * delta_time);
+            updated = true;
+        }
     
         m_speed = original_speed;
 
         m_alpha_rads += input.mouse_delta_y() * m_sensitivity * DEG_TO_RAD;
         m_phi_rads += input.mouse_delta_x() * m_sensitivity * DEG_TO_RAD;
+
+        if (input.mouse_delta_x() || input.mouse_delta_y())
+            updated = true;
+        
+        if (updated)
+            m_view_matrix = compute_view_matrix();  
     }
 }

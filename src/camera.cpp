@@ -59,18 +59,24 @@ namespace yazpgp
 
     void Camera::rotate_up(float angle_deg)
     {
-        m_alpha_rads -= angle_deg * DEG_TO_RAD;
+        m_alpha_rads += angle_deg * DEG_TO_RAD;
         m_alpha_rads = std::clamp(m_alpha_rads, epsilon, PI - epsilon);
     }
 
     void Camera::move_forward(float distance)
     {
-        m_position += distance * target();
+        auto movement_target = target();
+        movement_target.y = 0;
+        movement_target = glm::normalize(movement_target);
+        m_position += distance * movement_target;
     }
 
     void Camera::move_right(float distance)
     {
-        m_position += distance * glm::cross(target(), m_up);
+        auto movement_target = target();
+        movement_target.y = 0;
+        movement_target = glm::normalize(movement_target);
+        m_position += distance * glm::cross(movement_target, m_up);
     }
 
     void Camera::move_up(float distance)
@@ -106,12 +112,12 @@ namespace yazpgp
             move_right(-m_speed * delta_time);
             updated = true;
         }
-        if (input.get_key(Key::E))
+        if (input.get_key(Key::SPACE))
         {
             move_up(m_speed * delta_time);
             updated = true;
         }
-        if (input.get_key(Key::Q))
+        if (input.get_key(Key::LSHIFT))
         {
             move_up(-m_speed * delta_time);
             updated = true;
@@ -119,8 +125,10 @@ namespace yazpgp
     
         m_speed = original_speed;
 
-        m_alpha_rads += input.mouse_delta_y() * m_sensitivity * DEG_TO_RAD;
-        m_phi_rads += input.mouse_delta_x() * m_sensitivity * DEG_TO_RAD;
+        // m_alpha_rads += input.mouse_delta_y() * m_sensitivity * DEG_TO_RAD;
+        // m_phi_rads += input.mouse_delta_x() * m_sensitivity * DEG_TO_RAD;
+        rotate_up(input.mouse_delta_y() * m_sensitivity);
+        rotate_right(input.mouse_delta_x() * m_sensitivity);
 
         if (input.mouse_delta_x() || input.mouse_delta_y())
             updated = true;

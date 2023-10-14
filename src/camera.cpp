@@ -28,6 +28,7 @@ namespace yazpgp
     , m_phi_rads(phi_deg * DEG_TO_RAD)
     , m_speed(speed)
     , m_sensitivity(sensitivity)
+    , m_update(false)
     {}
 
 
@@ -42,6 +43,12 @@ namespace yazpgp
 
     const glm::mat4& Camera::view_matrix() const
     {
+        if (m_update)
+        {
+            m_view_matrix = compute_view_matrix();
+            m_update = false;
+        }
+
         return m_view_matrix;
     }
 
@@ -55,12 +62,16 @@ namespace yazpgp
     {
         m_phi_rads += angle_deg * DEG_TO_RAD;
         m_phi_rads = std::fmod(m_phi_rads, 2 * PI);
+
+        m_update = true;
     }
 
     void Camera::rotate_up(float angle_deg)
     {
         m_alpha_rads += angle_deg * DEG_TO_RAD;
         m_alpha_rads = std::clamp(m_alpha_rads, epsilon, PI - epsilon);
+
+        m_update = true;
     }
 
     void Camera::move_forward(float distance)
@@ -69,6 +80,8 @@ namespace yazpgp
         movement_target.y = 0;
         movement_target = glm::normalize(movement_target);
         m_position += distance * movement_target;
+
+        m_update = true;
     }
 
     void Camera::move_right(float distance)
@@ -77,11 +90,15 @@ namespace yazpgp
         movement_target.y = 0;
         movement_target = glm::normalize(movement_target);
         m_position += distance * glm::cross(movement_target, m_up);
+
+        m_update = true;
     }
 
     void Camera::move_up(float distance)
     {
         m_position += distance * m_up;
+
+        m_update = true;
     }
 
     void Camera::update(const InputManager& input, float delta_time)
@@ -90,50 +107,32 @@ namespace yazpgp
         if (input.get_key(Key::LSHIFT))
             m_speed *= 2.0f;
 
-        bool updated = false;
-
         if (input.get_key(Key::W))
-        {
             move_forward(m_speed * delta_time);
-            updated = true;
-        }
+
         if (input.get_key(Key::S))
-        {
             move_forward(-m_speed * delta_time);
-            updated = true;
-        }
+
         if (input.get_key(Key::D))
-        {
             move_right(m_speed * delta_time);
-            updated = true;
-        }
+
         if (input.get_key(Key::A))
-        {
             move_right(-m_speed * delta_time);
-            updated = true;
-        }
-        if (input.get_key(Key::SPACE))
-        {
+
+        if (input.get_key(Key::E))
             move_up(m_speed * delta_time);
-            updated = true;
-        }
-        if (input.get_key(Key::LSHIFT))
-        {
+
+        if (input.get_key(Key::Q))
             move_up(-m_speed * delta_time);
-            updated = true;
-        }
     
         m_speed = original_speed;
 
-        // m_alpha_rads += input.mouse_delta_y() * m_sensitivity * DEG_TO_RAD;
-        // m_phi_rads += input.mouse_delta_x() * m_sensitivity * DEG_TO_RAD;
         rotate_up(input.mouse_delta_y() * m_sensitivity);
-        rotate_right(input.mouse_delta_x() * m_sensitivity);
+        rotate_right(input.mouse_delta_x() * m_sensitivity);   
+    }
 
-        if (input.mouse_delta_x() || input.mouse_delta_y())
-            updated = true;
-        
-        if (updated)
-            m_view_matrix = compute_view_matrix();  
+    const glm::vec3& Camera::position() const
+    {
+        return m_position;
     }
 }

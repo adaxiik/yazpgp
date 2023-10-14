@@ -5,6 +5,7 @@
 #include "mesh.hpp"
 #include "texture.hpp"
 #include "transform.hpp"
+#include "light.hpp"
 
 namespace yazpgp
 {
@@ -21,7 +22,10 @@ namespace yazpgp
             const std::vector<std::shared_ptr<Texture>>& textures = {},
             const Transform& transform = Transform::default_transform()
         );
-        void render(const glm::mat4& view_projection_matrix) const;
+        void render(
+            const glm::mat4& view_projection_matrix,
+            const std::vector<PointLight>& lights,
+            const glm::vec3& camera_position) const;
         Transform& transform();
     };
 }

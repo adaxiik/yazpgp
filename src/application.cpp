@@ -122,10 +122,19 @@ namespace yazpgp
 
         if (not textured_shader)
             return 1;
+
+        auto phong_shader = io::load_shader_from_file(
+            "assets/shaders/phong/phong.vs",
+            "assets/shaders/phong/phong.fs"
+        );
+
+        if (not phong_shader)
+            return 1;    
         
         auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
 
-        #if 1
+        #define SCENE 2
+        #if SCENE == 0
         Scene scene({
             Scene::SceneRenderableEntity{
                 .shader = textured_shader,
@@ -135,12 +144,6 @@ namespace yazpgp
             Scene::SceneRenderableEntity{
                 .shader = white_shader,
                 .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
-            },
-            Scene::SceneRenderableEntity{
-                .shader = white_shader,
-                .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
-                .transform = Transform::default_transform()
-                                        .translate({0.0f, 5.0f,0.0f})
             },
             // Scene::SceneRenderableEntity{
             //     .shader = textured_shader,
@@ -161,7 +164,7 @@ namespace yazpgp
             //     }))
             // }
         });
-        #else
+        #elif SCENE == 1
         Scene scene({
             Scene::SceneRenderableEntity{
                 .shader = normal_shader,
@@ -184,6 +187,48 @@ namespace yazpgp
                 }))
             }
         });
+        #elif SCENE == 2
+        auto ball_mesh = io::load_mesh_from_file("assets/models/ball.obj");
+        if (not ball_mesh)
+            return 1;
+
+        auto cube_mesh = io::load_mesh_from_file("assets/models/cube.obj");
+        if (not cube_mesh)
+            return 1;
+
+        Scene scene({
+            // Scene::SceneRenderableEntity{
+            //     .shader = white_shader,
+            //     .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
+            // },
+            Scene::SceneRenderableEntity{
+                .shader = phong_shader,
+                .mesh = ball_mesh,
+                .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f})
+            },
+            Scene::SceneRenderableEntity{
+                .shader = phong_shader,
+                .mesh = ball_mesh,
+                .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f})
+            },
+            Scene::SceneRenderableEntity{
+                .shader = phong_shader,
+                .mesh = ball_mesh,
+                .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f})
+            },
+            Scene::SceneRenderableEntity{
+                .shader = phong_shader,
+                .mesh = ball_mesh,
+                .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
+            },
+            Scene::SceneRenderableEntity{
+                .shader = phong_shader,
+                .mesh = cube_mesh,
+                .transform = Transform::default_transform().translate({3.0f, -2.0f, 0.0f})
+            },
+
+        });
+        scene.add_light(PointLight{});
         #endif
 
         float fov = 60.0f;

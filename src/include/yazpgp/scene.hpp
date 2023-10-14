@@ -3,6 +3,7 @@
 #include "renderable_entity.hpp"
 #include "camera.hpp"
 #include "input_manager.hpp"
+#include "light.hpp"
 
 namespace yazpgp
 {
@@ -16,12 +17,13 @@ namespace yazpgp
             std::vector<std::shared_ptr<Texture>> textures = {};
             Transform transform = Transform::default_transform();
         };
-        Scene() = default;
+        Scene();
         Scene(std::vector<std::unique_ptr<RenderableEntity>> entities);
         Scene(const std::vector<SceneRenderableEntity>& entities);
 
-        void add_entity(std::unique_ptr<RenderableEntity> entity);
-        void add_entity(const SceneRenderableEntity& entity);
+        Scene& add_entity(std::unique_ptr<RenderableEntity> entity);
+        Scene& add_entity(const SceneRenderableEntity& entity);
+        Scene& add_light(const PointLight& light);
 
         auto begin() { return m_entities.begin(); }
         auto end() { return m_entities.end(); }
@@ -30,7 +32,8 @@ namespace yazpgp
         void update(const InputManager& input_manager, double delta_time);
 
     private:
-        std::vector<std::unique_ptr<RenderableEntity>> m_entities;
         Camera m_camera;
+        std::vector<std::unique_ptr<RenderableEntity>> m_entities;
+        std::vector<PointLight> m_lights;  
     };
 } 

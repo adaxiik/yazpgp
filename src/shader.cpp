@@ -113,4 +113,29 @@ namespace yazpgp
         auto location = glGetUniformLocation(m_program, name.c_str());
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
     }
+
+    void Shader::set_uniform(const std::string& name, const glm::vec3& value) const
+    {
+        auto location = glGetUniformLocation(m_program, name.c_str());
+        glUniform3fv(location, 1, glm::value_ptr(value));
+    }
+
+    void Shader::set_uniform(const std::string& name, const glm::vec4& value) const
+    {
+        auto location = glGetUniformLocation(m_program, name.c_str());
+        glUniform4fv(location, 1, glm::value_ptr(value));
+    }
+
+    void Shader::set_uniform(const std::string& name, const float value) const
+    {
+        auto location = glGetUniformLocation(m_program, name.c_str());
+        glUniform1f(location, value);
+    }
+
+    void Shader::set_uniform(const std::string& name, const int value) const
+    {
+        auto location = glGetUniformLocation(m_program, name.c_str());
+        glUniform1i(location, value);
+    }
+    
 }

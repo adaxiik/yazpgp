@@ -127,6 +127,9 @@ namespace yazpgp
     
         m_speed = original_speed;
 
+        if (not input.relative_mouse_mode())
+            return;
+
         rotate_up(input.mouse_delta_y() * m_sensitivity);
         rotate_right(input.mouse_delta_x() * m_sensitivity);   
     }

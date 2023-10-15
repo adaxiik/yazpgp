@@ -25,6 +25,8 @@
 
 #include "camera.hpp"
 
+#include "debug/debug_ui.hpp"
+
 namespace yazpgp
 {
     Application::Application(const ApplicationConfig& config)
@@ -224,7 +226,7 @@ namespace yazpgp
             Scene::SceneRenderableEntity{
                 .shader = phong_shader,
                 .mesh = cube_mesh,
-                .transform = Transform::default_transform().translate({3.0f, -2.0f, 0.0f})
+                .transform = Transform::default_transform().translate({3.0f, -2.0f, 0.0f}),
             },
 
         });
@@ -273,6 +275,7 @@ namespace yazpgp
             m_window->pool_events();
             scene.update(m_window->input_manager(), m_window->delta_time());
             scene.render(projection_matrix);
+            DebugUI::scene_window(scene);
             this->frame();
         }
 

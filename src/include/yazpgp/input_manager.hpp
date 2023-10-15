@@ -35,6 +35,7 @@ namespace yazpgp
         bool get_key(Key key) const;
         bool get_key_down(Key key) const;
         bool get_key_up(Key key) const;
+        bool relative_mouse_mode() const;
         int mouse_x() const;
         int mouse_y() const;
         int mouse_delta_x() const;

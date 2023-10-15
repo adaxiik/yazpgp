@@ -5,17 +5,21 @@
 #include "input_manager.hpp"
 #include "light.hpp"
 
+#include "debug/debug_ui_def.hpp"
+
 namespace yazpgp
 {
     class Scene
     {
     public:
+        ENABLE_DEBUG_UI();
         struct SceneRenderableEntity
         {
             std::shared_ptr<Shader> shader;
             std::shared_ptr<Mesh> mesh;
             std::vector<std::shared_ptr<Texture>> textures = {};
             Transform transform = Transform::default_transform();
+            std::function<void(const Scene&, double)> on_update = [](const Scene&, double) {};
         };
         Scene();
         Scene(std::vector<std::unique_ptr<RenderableEntity>> entities);

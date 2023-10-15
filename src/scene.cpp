@@ -17,7 +17,15 @@ namespace yazpgp
     Scene::Scene(const std::vector<SceneRenderableEntity>& entities): Scene()
     {
         for (const auto& entity : entities)
-            m_entities.push_back(std::make_unique<RenderableEntity>(entity.shader, entity.mesh, entity.textures, entity.transform));
+        {   
+            m_entities.push_back(std::make_unique<RenderableEntity>(
+                entity.shader,
+                entity.mesh,
+                entity.textures,
+                entity.transform,
+                entity.on_update
+            ));
+        }
     }
 
     void Scene::render(const glm::mat4& projection_matrix) const
@@ -31,6 +39,8 @@ namespace yazpgp
     void Scene::update(const InputManager& input_manager, double delta_time)
     {
         m_camera.update(input_manager, delta_time);
+        for (const auto& entity : m_entities)
+            entity->update(*this, delta_time);
     }
 
     Scene& Scene::add_entity(std::unique_ptr<RenderableEntity> entity)
@@ -41,7 +51,13 @@ namespace yazpgp
 
     Scene& Scene::add_entity(const SceneRenderableEntity& entity)
     {
-        m_entities.push_back(std::make_unique<RenderableEntity>(entity.shader, entity.mesh, entity.textures, entity.transform));
+        m_entities.push_back(std::make_unique<RenderableEntity>(
+            entity.shader,
+            entity.mesh,
+            entity.textures,
+            entity.transform,
+            entity.on_update
+        ));
         return *this;
     }
 

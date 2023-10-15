@@ -163,4 +163,9 @@ namespace yazpgp
         return m_mouse_delta_y;
     }
 
+    bool InputManager::relative_mouse_mode() const
+    {
+        return SDL_GetRelativeMouseMode() == SDL_TRUE;
+    }
+
 }

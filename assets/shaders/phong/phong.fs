@@ -3,6 +3,7 @@ out vec4 frag_color;
 in vec3 vs_normal;
 in vec2 vs_texcoord;
 in vec3 world_position;
+
 uniform sampler2D fs_tex0;
 
 struct PointLight{
@@ -19,7 +20,7 @@ uniform int num_point_lights;
 uniform PointLight point_lights[MAX_POINT_LIGHTS];
 
 uniform vec3 camera_position;
-
+uniform mat4 model_matrix;
 void main () {
     // frag_color = vec4 (point_lights[0].color, 1.0f);
     // frag_color = texture(fs_tex0, vs_texcoord);
@@ -28,7 +29,7 @@ void main () {
     PointLight light = point_lights[0];
     vec3 ambient_light = light.ambient_intensity * light.color;
 
-    vec3 normal = vs_normal;
+    vec3 normal = normalize(mat3(model_matrix) * vs_normal);
     vec3 light_direction = normalize(light.position - world_position);
     float diffuse_factor = max(dot(normal, light_direction), 0.0f);
     vec3 diffuse_light = diffuse_factor * light.diffuse_intensity * light.color;

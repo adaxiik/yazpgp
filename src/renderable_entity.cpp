@@ -1,4 +1,5 @@
 #include "renderable_entity.hpp"
+#include "scene.hpp"
 
 namespace yazpgp
 {
@@ -6,11 +7,14 @@ namespace yazpgp
         const std::shared_ptr<Shader>& shader,
         const std::shared_ptr<Mesh>& mesh,
         const std::vector<std::shared_ptr<Texture>>& textures,
-        const Transform& transform)
-        : m_shader(shader)
-        , m_mesh(mesh)
+        const Transform& transform,
+        std::function<void(const Scene&, double)> on_update
+    )
+        : m_transform(transform)
         , m_textures(textures)
-        , m_transform(transform)
+        , m_shader(shader)
+        , m_mesh(mesh)
+        , m_on_update(on_update)
     {
     }
 
@@ -45,5 +49,11 @@ namespace yazpgp
         m_mesh->use();
         // glDrawArrays(GL_TRIANGLES, 0, m_mesh->get_vert_count());
         glDrawElements(GL_TRIANGLES, m_mesh->get_index_count(), GL_UNSIGNED_INT, 0);
+    }
+
+    void RenderableEntity::update(const Scene& scene, double delta_time)
+    {
+        if (m_on_update)
+            m_on_update(scene, delta_time);
     }
 }

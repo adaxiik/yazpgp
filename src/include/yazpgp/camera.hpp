@@ -3,10 +3,14 @@
 
 #include "input_manager.hpp"
 #include "event_source.hpp"
+#include "debug/debug_ui_def.hpp"
+
 namespace yazpgp
 {
     class Camera
     {
+        ENABLE_DEBUG_UI();
+        
         mutable glm::mat4 m_view_matrix;
         glm::vec3 m_position;
         const glm::vec3 m_up;

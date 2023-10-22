@@ -68,9 +68,8 @@ namespace yazpgp
                 const aiMesh* mesh = scene->mMeshes[i];
                 for (size_t j = 0; j < mesh->mNumFaces; j++)
                 {
-                    indices.push_back(mesh->mFaces[j].mIndices[2]);
-                    indices.push_back(mesh->mFaces[j].mIndices[1]);
-                    indices.push_back(mesh->mFaces[j].mIndices[0]);
+                    for (size_t k = 0; k < mesh->mFaces[j].mNumIndices; k++)
+                        indices.push_back(mesh->mFaces[j].mIndices[k]);
                 }
             }
             

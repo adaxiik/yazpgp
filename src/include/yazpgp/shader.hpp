@@ -20,6 +20,7 @@ namespace yazpgp
         void use() const;
 
         void set_uniform(const std::string& name, const glm::mat4& value) const;
+        void set_uniform(const std::string& name, const glm::mat3& value) const;
         void set_uniform(const std::string& name, const glm::vec3& value) const;
         void set_uniform(const std::string& name, const glm::vec4& value) const;
         void set_uniform(const std::string& name, const float value) const;

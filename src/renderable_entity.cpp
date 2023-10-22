@@ -42,6 +42,7 @@ namespace yazpgp
             m_shader->set_uniform("point_lights[" + std::to_string(i) + "].diffuse_intensity", lights[i].diffuse_intensity);
             m_shader->set_uniform("point_lights[" + std::to_string(i) + "].specular_intensity", lights[i].specular_intensity);
         }
+        m_shader->set_uniform("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transform.model_matrix()))));
 
         for (size_t i = 0; i < m_textures.size(); i++)
             m_textures[i]->use(i);

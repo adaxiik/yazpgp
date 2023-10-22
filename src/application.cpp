@@ -58,58 +58,7 @@ namespace yazpgp
         if (not m_window)
             return 1;
 
-        // float tris[] = {
-        //     0.0f, 0.5f, 0.0f,
-        //     0.5f, -0.5f, 0.0f,
-        //     -0.5f, -0.5f, 0.0f
-        // };
-
-        // float quad[] = {
-        //     -0.1f, 0.1f, 0.0f,
-        //     0.1f, 0.1f, 0.0f,
-        //     0.1f, -0.1f, 0.0f,
-
-        //     -0.1f, 0.1f, 0.0f,
-        //     0.1f, -0.1f, 0.0f,
-        //     -0.1f, -0.1f, 0.0f
-        // };
-
-        // RenderableEntity triangle_entity(triangle_shader, std::make_shared<Mesh>(
-        //     tris, 
-        //     sizeof(tris),
-        //     VertexAttributeLayout({
-        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-        //     })));
-
-        // RenderableEntity quad_entity(quad_shader, std::make_shared<Mesh>(
-        //     quad, 
-        //     sizeof(quad),
-        //     VertexAttributeLayout({
-        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-        //     })));
-
-        // RenderableEntity sphere_entity(normal_shader, std::make_shared<Mesh>(
-        //     sphere_verts, 
-        //     sizeof(sphere_verts),
-        //     VertexAttributeLayout({
-        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-        //     })));
-
-        // RenderableEntity suzi_entity(normal_shader, std::make_shared<Mesh>(
-        //     suzi_flat_verts, 
-        //     sizeof(suzi_flat_verts),
-        //     VertexAttributeLayout({
-        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-        //         {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-        //     })));
-
-        // auto suzi_mesh = io::load_mesh_from_file("models/suzi.obj");
-        // RenderableEntity suzi_entity(normal_shader, suzi_mesh);
-
-        auto rat_texture = io::load_texture_from_file("assets/textures/rat_diff.jpg");
-        auto backpack_texture = io::load_texture_from_file("assets/textures/backpack_diff.jpg");
-        
+        // Normal shader
         auto normal_shader = io::load_shader_from_file(
             "assets/shaders/normals/normals.vs",
             "assets/shaders/normals/normals.fs"
@@ -117,121 +66,143 @@ namespace yazpgp
         if (not normal_shader)
             return 1;
 
-        auto textured_shader = io::load_shader_from_file(
-            "assets/shaders/textured/textured.vs",
-            "assets/shaders/textured/textured.fs"
-        );
-
-        if (not textured_shader)
-            return 1;
-
-        auto phong_shader = io::load_shader_from_file(
-            "assets/shaders/phong/phong.vs",
-            "assets/shaders/phong/phong.fs"
-        );
-
-        if (not phong_shader)
-            return 1;    
-        
-        auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
-
-        #define SCENE 2
-        #if SCENE == 0
-        Scene scene({
-            Scene::SceneRenderableEntity{
-                .shader = textured_shader,
-                .mesh = io::load_mesh_from_file("assets/models/rat.obj"),
-                .textures = { rat_texture }
-            },
-            Scene::SceneRenderableEntity{
-                .shader = white_shader,
-                .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
-            },
-            // Scene::SceneRenderableEntity{
-            //     .shader = textured_shader,
-            //     .mesh = io::load_mesh_from_file("assets/models/backpack.obj"),
-            //     .textures = { backpack_texture },
-            //     .transform = Transform::default_transform()
-            //                             .translate({2.0f, 0.0f, -3.0f})
-                                        
-            // },
-            // Scene::SceneRenderableEntity{
-            //     .shader = normal_shader,
-            //     .mesh = std::make_shared<Mesh>(
-            //         sphere_verts, 
-            //         sizeof(sphere_verts),
-            //         VertexAttributeLayout({
-            //             {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-            //             {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-            //     }))
-            // }
-        });
-        #elif SCENE == 1
-        Scene scene({
-            Scene::SceneRenderableEntity{
-                .shader = normal_shader,
-                .mesh = std::make_shared<Mesh>(
-                    sphere_verts, 
-                    sizeof(sphere_verts),
-                    VertexAttributeLayout({
-                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-                }))
-            },
-            Scene::SceneRenderableEntity{
-                .shader = normal_shader,
-                .mesh = std::make_shared<Mesh>(
-                    sphere_verts, 
-                    sizeof(sphere_verts),
-                    VertexAttributeLayout({
-                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                        {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE}
-                }))
-            }
-        });
-        #elif SCENE == 2
+        // Ball mesh
         auto ball_mesh = io::load_mesh_from_file("assets/models/ball.obj");
         if (not ball_mesh)
             return 1;
 
-        auto cube_mesh = io::load_mesh_from_file("assets/models/cube.obj");
-        if (not cube_mesh)
+        // phone shader
+        auto phong_shader = io::load_shader_from_file(
+            "assets/shaders/phong/phong.vs",
+            "assets/shaders/phong/phong.fs"
+        );
+        if (not phong_shader)
+            return 1;  
+
+        // tonk mesh
+        auto tonk_mesh = io::load_mesh_from_file("assets/models/tonk.fbx");
+        if (not tonk_mesh)
             return 1;
 
-        Scene scene({
-            // Scene::SceneRenderableEntity{
-            //     .shader = white_shader,
-            //     .mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj"),
-            // },
-            Scene::SceneRenderableEntity{
-                .shader = phong_shader,
-                .mesh = ball_mesh,
-                .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f})
-            },
-            Scene::SceneRenderableEntity{
-                .shader = phong_shader,
-                .mesh = ball_mesh,
-                .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f})
-            },
-            Scene::SceneRenderableEntity{
-                .shader = phong_shader,
-                .mesh = ball_mesh,
-                .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f})
-            },
-            Scene::SceneRenderableEntity{
-                .shader = phong_shader,
-                .mesh = ball_mesh,
-                .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
-            },
-            Scene::SceneRenderableEntity{
-                .shader = phong_shader,
-                .mesh = cube_mesh,
-                .transform = Transform::default_transform().translate({3.0f, -2.0f, 0.0f}),
-            },
+        // tonk texture
+        auto tonk_texture = io::load_texture_from_file("assets/textures/tonk_diff.png");
+        if (not tonk_texture)
+            return 1;
 
-        });
-        scene.add_light(PointLight{});
-        #endif
+        // phong textured shader
+        auto phong_textured_shader = io::load_shader_from_file(
+            "assets/shaders/phong_textured/phong_textured.vs",
+            "assets/shaders/phong_textured/phong_textured.fs"
+        );
+        if (not phong_textured_shader)
+            return 1;
+
+        // grid mesh
+        auto grid_mesh = io::load_mesh_from_file("assets/models/grid20m20x20.obj");
+        if (not grid_mesh)
+            return 1;
+
+        // lambert shader
+        auto lambert_shader = io::load_shader_from_file(
+            "assets/shaders/lambert/lambert.vs",
+            "assets/shaders/lambert/lambert.fs"
+        );
+        if (not lambert_shader)
+            return 1;
+
+        // ambient
+        auto ambient_shader = io::load_shader_from_file(
+            "assets/shaders/ambient/ambient.vs",
+            "assets/shaders/ambient/ambient.fs"
+        );
+        if (not ambient_shader)
+            return 1;
+        
+        auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
+        
+
+        // scenes
+        std::vector<Scene> scenes;
+        
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = phong_textured_shader,
+                .mesh = tonk_mesh,
+                .textures = { tonk_texture },
+                .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = white_shader,
+                .mesh = grid_mesh,
+                .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
+            })
+            .add_light(
+                PointLight{}
+            )
+        ));
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
+            })
+            .add_light(
+                PointLight{}
+            )
+        ));
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({-5.0f, 0.0f, 0.0f})
+            })
+            .add_light(
+                PointLight{}
+            )
+        ));
+
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = lambert_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = ambient_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
+            })
+            .add_light(
+                PointLight{}
+            )
+        ));
 
         float fov = 60.0f;
         glm::mat4 projection_matrix = glm::perspective(fov, (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
@@ -270,8 +241,19 @@ namespace yazpgp
             }}
         );
 
+        int current_scene = 0;
+        m_window->input_manager().add_listener(
+            KeyDownEvent::Callback{[&](KeyDownEvent event) {
+                if (event.key == Key::RIGHT)
+                    current_scene = (current_scene + 1) % scenes.size();
+                else if (event.key == Key::LEFT)
+                    current_scene = (current_scene + scenes.size() - 1) % scenes.size();
+            }}
+        );
+
         while (m_window->is_running())
         {
+            auto& scene = scenes[current_scene];
             m_window->pool_events();
             scene.update(m_window->input_manager(), m_window->delta_time());
             scene.render(projection_matrix);

@@ -24,6 +24,11 @@ namespace yazpgp
         Scene();
         Scene(std::vector<std::unique_ptr<RenderableEntity>> entities);
         Scene(const std::vector<SceneRenderableEntity>& entities);
+        ~Scene() = default;
+        Scene(const Scene&) = delete;
+        Scene& operator=(const Scene&) = delete;
+        Scene(Scene&&) = default;
+        Scene& operator=(Scene&&) = default;
 
         Scene& add_entity(std::unique_ptr<RenderableEntity> entity);
         Scene& add_entity(const SceneRenderableEntity& entity);

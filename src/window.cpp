@@ -64,7 +64,7 @@ namespace yazpgp
 
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        glFrontFace(GL_CW);  
+        glFrontFace(GL_CCW);  
         glEnable(GL_DEPTH_TEST);
 
         YAZPGP_LOG_INFO("Glew initialized");

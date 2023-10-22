@@ -6,7 +6,7 @@ namespace yazpgp
 {
     Scene::Scene()
     {
-        m_camera.move_forward(-5.0f);
+        m_camera.move_forward(-10.0f);
     }
 
     Scene::Scene(std::vector<std::unique_ptr<RenderableEntity>> entities): Scene()

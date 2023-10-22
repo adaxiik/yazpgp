@@ -24,14 +24,13 @@ uniform mat3 normal_matrix;
 
 void main () {
     // frag_color = vec4 (point_lights[0].color, 1.0f);
-    // frag_color = texture(fs_tex0, vs_texcoord);
-    vec3 self_color = vec3(1.0);
+    vec3 self_color = texture(fs_tex0, vs_texcoord).xyz;
+    // vec3 self_color = vec3(1.0, 0.0, 0.0);
     
     PointLight light = point_lights[0];
     vec3 ambient_light = light.ambient_intensity * light.color;
 
     vec3 normal = normalize(normal_matrix * vs_normal);
-
 
     vec3 light_direction = normalize(light.position - world_position);
     float diffuse_factor = max(dot(normal, light_direction), 0.0f);
@@ -39,7 +38,7 @@ void main () {
 
     vec3 view_direction = normalize(camera_position - world_position);
     vec3 reflect_direction = reflect(-light_direction, normal);
-    float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0f), 32);
+    float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0f), 16.0f);
     // float specular_factor = max(dot(view_direction, reflect_direction), 0.0f);
     vec3 specular_light = specular_factor * light.specular_intensity * light.color;
 

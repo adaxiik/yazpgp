@@ -111,37 +111,43 @@ namespace yazpgp
     void Shader::set_uniform(const std::string& name, const glm::mat4& value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
-        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+        // glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+        glProgramUniformMatrix4fv(m_program, location, 1, GL_FALSE, glm::value_ptr(value));
     }
 
     void Shader::set_uniform(const std::string& name, const glm::mat3& value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
-        glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+        // glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+        glProgramUniformMatrix3fv(m_program, location, 1, GL_FALSE, glm::value_ptr(value));
     }
 
     void Shader::set_uniform(const std::string& name, const glm::vec3& value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
-        glUniform3fv(location, 1, glm::value_ptr(value));
+        // glUniform3fv(location, 1, glm::value_ptr(value));
+        glProgramUniform3fv(m_program, location, 1, glm::value_ptr(value));
     }
 
     void Shader::set_uniform(const std::string& name, const glm::vec4& value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
-        glUniform4fv(location, 1, glm::value_ptr(value));
+        // glUniform4fv(location, 1, glm::value_ptr(value));
+        glProgramUniform4fv(m_program, location, 1, glm::value_ptr(value));
     }
 
     void Shader::set_uniform(const std::string& name, const float value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
-        glUniform1f(location, value);
+        // glUniform1f(location, value);
+        glProgramUniform1f(m_program, location, value);
     }
 
     void Shader::set_uniform(const std::string& name, const int value) const
     {
         auto location = glGetUniformLocation(m_program, name.c_str());
-        glUniform1i(location, value);
+        // glUniform1i(location, value);
+        glProgramUniform1i(m_program, location, value);
     }
     
 }

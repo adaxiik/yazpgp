@@ -110,6 +110,13 @@ namespace yazpgp
         if (not lambert_shader)
             return 1;
 
+         auto blinn_shader = io::load_shader_from_file(
+            "assets/shaders/blinn/blinn.vs",
+            "assets/shaders/blinn/blinn.fs"
+        );
+        if (not blinn_shader)
+            return 1;
+
         // ambient
         auto ambient_shader = io::load_shader_from_file(
             "assets/shaders/ambient/ambient.vs",
@@ -118,8 +125,19 @@ namespace yazpgp
         if (not ambient_shader)
             return 1;
         
-        auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
         
+        // mad textrure
+        auto mad_texture = io::load_texture_from_file("assets/textures/mad.png");
+        if (not mad_texture)
+            return 1;
+
+        // mad mesh
+        auto mad_mesh = io::load_mesh_from_file("assets/models/mad.obj");
+        if (not mad_mesh)
+            return 1;
+
+
+        auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
 
         // scenes
         std::vector<Scene> scenes;
@@ -139,6 +157,25 @@ namespace yazpgp
             })
             .add_light(
                 PointLight{}
+            )
+        ));
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = phong_textured_shader,
+                .mesh = mad_mesh,
+                .textures = { mad_texture },
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = white_shader,
+                .mesh = grid_mesh,
+                .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
+            })
+            .add_light(
+                PointLight{
+                    .position = {0.f, 5.f, 3.f},
+                }
             )
         ));
 
@@ -199,6 +236,11 @@ namespace yazpgp
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
             })
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = blinn_shader,
+                    .mesh = ball_mesh,
+                    .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f})
+            })
             .add_light(
                 PointLight{}
             )
@@ -258,6 +300,7 @@ namespace yazpgp
             scene.update(m_window->input_manager(), m_window->delta_time());
             scene.render(projection_matrix);
             DebugUI::scene_window(scene);
+
             this->frame();
         }
 

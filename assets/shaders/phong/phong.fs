@@ -40,7 +40,10 @@ void main () {
     vec3 view_direction = normalize(camera_position - world_position);
     vec3 reflect_direction = reflect(-light_direction, normal);
     float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0f), 32);
-    // float specular_factor = max(dot(view_direction, reflect_direction), 0.0f);
+    // if (diffuse_factor == 0.0f) {
+    //     specular_factor = 0.0f;
+    // }
+
     vec3 specular_light = specular_factor * light.specular_intensity * light.color;
 
 

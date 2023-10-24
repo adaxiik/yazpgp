@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "input_manager.hpp"
 #include "light.hpp"
+#include "skybox.hpp"
 
 #include "debug/debug_ui_def.hpp"
 
@@ -33,6 +34,7 @@ namespace yazpgp
         Scene& add_entity(std::unique_ptr<RenderableEntity> entity);
         Scene& add_entity(const SceneRenderableEntity& entity);
         Scene& add_light(const PointLight& light);
+        Scene& set_skybox(std::shared_ptr<Skybox> skybox);
 
         auto begin() { return m_entities.begin(); }
         auto end() { return m_entities.end(); }
@@ -44,5 +46,6 @@ namespace yazpgp
         Camera m_camera;
         std::vector<std::unique_ptr<RenderableEntity>> m_entities;
         std::vector<PointLight> m_lights;  
+        std::shared_ptr<Skybox> m_skybox;
     };
 } 

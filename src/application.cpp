@@ -136,6 +136,42 @@ namespace yazpgp
         if (not mad_mesh)
             return 1;
 
+        auto cubemap_ocean = io::load_cubemap_from_files({
+            "assets/textures/skybox_ocean/right.jpg",
+            "assets/textures/skybox_ocean/left.jpg",
+            "assets/textures/skybox_ocean/top.jpg",
+            "assets/textures/skybox_ocean/bottom.jpg",
+            "assets/textures/skybox_ocean/front.jpg",
+            "assets/textures/skybox_ocean/back.jpg",
+        });
+        if (not cubemap_ocean)
+            return 1;
+
+        auto cubemap_factory = io::load_cubemap_from_files({
+            "assets/textures/skybox_factory/face0.png",
+            "assets/textures/skybox_factory/face1.png",
+            "assets/textures/skybox_factory/face2.png",
+            "assets/textures/skybox_factory/face3.png",
+            "assets/textures/skybox_factory/face4.png",
+            "assets/textures/skybox_factory/face5.png",
+        });
+        if (not cubemap_factory)
+            return 1;
+
+        auto skybox_shader = io::load_shader_from_file(
+            "assets/shaders/skybox/skybox.vs",
+            "assets/shaders/skybox/skybox.fs"
+        );
+        if (not skybox_shader)
+            return 1;
+
+        auto skybox = std::make_shared<Skybox>(cubemap_factory, skybox_shader);
+
+
+        auto rtx_shader = io::load_shader_from_file(
+            "assets/shaders/rtx/rtx.vs",
+            "assets/shaders/rtx/rtx.fs"
+        );
 
         auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
 
@@ -244,6 +280,34 @@ namespace yazpgp
             .add_light(
                 PointLight{}
             )
+        ));
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = phong_textured_shader,
+                .mesh = tonk_mesh,
+                .textures = { tonk_texture },
+                .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f})
+            })
+            .add_light(
+            PointLight{.position = {0.f, 3.f, 3.f}}
+            )
+            .set_skybox(skybox)
+        ));
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = rtx_shader,
+                .mesh = ball_mesh,
+                .textures = { cubemap_factory },
+                .transform = Transform::default_transform(),
+            })
+            .add_light(
+                PointLight{.position = {0.f, 3.f, 3.f}}
+            )
+            .set_skybox(skybox)
         ));
 
         float fov = 60.0f;

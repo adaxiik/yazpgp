@@ -93,7 +93,7 @@ namespace yazpgp
             return Shader::create_shader(vertex_source.value(), fragment_source.value());
         }
 
-        std::shared_ptr<Texture> load_texture_from_file(const std::string& path)
+        std::shared_ptr<Texture2D> load_texture_from_file(const std::string& path)
         {
             SDL_Surface* surface = IMG_Load(path.c_str());
             if (not surface)
@@ -113,7 +113,7 @@ namespace yazpgp
             }
 
 
-            auto texture =  std::make_shared<Texture>(
+            auto texture =  std::make_shared<Texture2D>(
                 static_cast<const char*>(surface->pixels),
                 surface->w,
                 surface->h,
@@ -143,6 +143,65 @@ namespace yazpgp
             file.read(&contents[0], contents.size());
 
             return contents;
+        }
+
+        std::shared_ptr<CubeMap> load_cubemap_from_files(const std::array<std::string, 6>& paths)
+        {
+            SDL_Surface* surfaces[6];
+            for (size_t i = 0; i < 6; i++)
+            {
+                surfaces[i] = IMG_Load(paths[i].c_str());
+                if (not surfaces[i])
+                {
+                    YAZPGP_LOG_ERROR("Failed to load cubemap from file: %s", paths[i].c_str());
+                    YAZPGP_LOG_ERROR("Error: %s", IMG_GetError());
+                    return nullptr;
+                }
+            }
+
+            auto cubemap = std::make_shared<CubeMap>(std::array<CubeMap::CubeMapDataPart, 6>({
+                CubeMap::CubeMapDataPart{
+                    .bytes = static_cast<const char*>(surfaces[0]->pixels),
+                    .width = surfaces[0]->w,
+                    .height = surfaces[0]->h,
+                    .channels = surfaces[0]->format->BytesPerPixel
+                },
+                {
+                    .bytes = static_cast<const char*>(surfaces[1]->pixels),
+                    .width = surfaces[1]->w,
+                    .height = surfaces[1]->h,
+                    .channels = surfaces[1]->format->BytesPerPixel
+                },
+                {
+                    .bytes = static_cast<const char*>(surfaces[2]->pixels),
+                    .width = surfaces[2]->w,
+                    .height = surfaces[2]->h,
+                    .channels = surfaces[2]->format->BytesPerPixel
+                },
+                {
+                    .bytes = static_cast<const char*>(surfaces[3]->pixels),
+                    .width = surfaces[3]->w,
+                    .height = surfaces[3]->h,
+                    .channels = surfaces[3]->format->BytesPerPixel
+                },
+                {
+                    .bytes = static_cast<const char*>(surfaces[4]->pixels),
+                    .width = surfaces[4]->w,
+                    .height = surfaces[4]->h,
+                    .channels = surfaces[4]->format->BytesPerPixel
+                },
+                {
+                    .bytes = static_cast<const char*>(surfaces[5]->pixels),
+                    .width = surfaces[5]->w,
+                    .height = surfaces[5]->h,
+                    .channels = surfaces[5]->format->BytesPerPixel
+                }
+            }));
+
+            for (size_t i = 0; i < 6; i++)
+                SDL_FreeSurface(surfaces[i]);
+
+            return cubemap;
         }
     }
 }

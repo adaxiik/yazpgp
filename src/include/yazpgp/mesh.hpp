@@ -3,6 +3,7 @@
 #include "vertex_attributes.hpp"
 #include "vertex.hpp"
 #include <vector>
+#include <memory>
 namespace yazpgp
 {
     class Mesh
@@ -21,6 +22,8 @@ namespace yazpgp
         ~Mesh();
         void use() const;
         size_t get_vert_count() const; 
-        size_t get_index_count() const;       
+        size_t get_index_count() const;   
+
+        static std::unique_ptr<Mesh> create_cube();    
     };
 }

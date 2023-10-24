@@ -32,8 +32,13 @@ namespace yazpgp
     {
         auto view_projection_matrix = projection_matrix * m_camera.view_matrix();
 
+        if (m_skybox)
+            m_skybox->render(projection_matrix, m_camera.view_matrix());
+
         for (const auto& entity : m_entities)
             entity->render(view_projection_matrix, m_lights, m_camera.position());
+        
+        
     }
 
     void Scene::update(const InputManager& input_manager, double delta_time)
@@ -70,6 +75,12 @@ namespace yazpgp
         }
 
         m_lights.push_back(light);
+        return *this;
+    }
+
+    Scene& Scene::set_skybox(std::shared_ptr<Skybox> skybox)
+    {
+        m_skybox = skybox;
         return *this;
     }
 }

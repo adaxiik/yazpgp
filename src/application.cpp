@@ -186,8 +186,8 @@ namespace yazpgp
 
         // scenes
         std::vector<Scene> scenes;
-
-        Transform::Mat4Compositor first_planet(Transform::Mat4Compositor::Composite({}));
+        Transform::Mat4Compositor center_planet;
+        Transform::Mat4Compositor first_planet;
         // Solar system scene
         scenes.push_back(std::move(
             Scene()
@@ -200,6 +200,11 @@ namespace yazpgp
                 .shader = phong_shader,
                 .mesh = ball_mesh,
                 .material = PhongBlinnMaterial::create_shared({0.f, 0.f, 0.8f}),
+                .transform_modifier = [&](const glm::mat4& m) {
+                    float angle = m_window->time() * 50;
+                    center_planet = m;
+                    return m;
+                }
             })
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = normal_shader,
@@ -209,6 +214,7 @@ namespace yazpgp
                     first_planet = Transform::Mat4Compositor::Composite({
                         Transform::Mat4Compositor::Rotate({0, angle, 0}),
                         Transform::Mat4Compositor::Translate({0, 0, 5}),
+                        center_planet,
                     })(m);
                     return first_planet.compose();
                 }

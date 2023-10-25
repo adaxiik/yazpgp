@@ -168,7 +168,7 @@ namespace yazpgp
             Mat4Compositor(const RotateData &rotate) : compositor(rotate) {}
             Mat4Compositor(const ScaleData &scale) : compositor(scale) {}
             Mat4Compositor(const CompositeData &composite) : compositor(composite) {}
-            Mat4Compositor(const Mat4Data &mat4) : compositor(mat4) {}
+            Mat4Compositor(const Mat4Data &mat4 = glm::mat4(1.0f)) : compositor(mat4) {}
 
             glm::mat4 operator()(const glm::mat4 &transform = glm::mat4(1.0f)) const
             {

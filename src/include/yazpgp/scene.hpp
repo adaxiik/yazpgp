@@ -5,7 +5,7 @@
 #include "input_manager.hpp"
 #include "light.hpp"
 #include "skybox.hpp"
-
+#include "material.hpp"
 #include "debug/debug_ui_def.hpp"
 
 namespace yazpgp
@@ -20,6 +20,7 @@ namespace yazpgp
             std::shared_ptr<Mesh> mesh;
             std::vector<std::shared_ptr<Texture>> textures = {};
             Transform transform = Transform::default_transform();
+            std::shared_ptr<Material> material = nullptr;
             RenderableEntity::TransformModifier transform_modifier = [](const glm::mat4& m) { return m; };
         };
         Scene();

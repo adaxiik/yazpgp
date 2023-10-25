@@ -70,6 +70,17 @@ namespace yazpgp
                     ImGui::DragFloat3("Position", (float*)&entity->transform().position_data);
                     ImGui::DragFloat3("Rotation", (float*)&entity->transform().rotation_data);
                     ImGui::DragFloat3("Scale", (float*)&entity->transform().scale_data);
+
+                    if (entity->m_material)
+                    {
+                        if (ImGui::TreeNode("Material"))
+                        {
+                            if (entity->m_material->kind() == Material::Kind::PhongBlinn)
+                                phong_blinn_material_component(*std::static_pointer_cast<PhongBlinnMaterial>(entity->m_material));
+
+                            ImGui::TreePop();
+                        }
+                    }
                     ImGui::TreePop();
                 }
                 
@@ -77,7 +88,17 @@ namespace yazpgp
             }
             ImGui::TreePop();
         }
-        
+    }
+
+    void DebugUI::phong_blinn_material_component(PhongBlinnMaterial& material)
+    {
+        ImGui::Text("Phong Blinn Material");
+        ImGui::Separator();
+        ImGui::ColorEdit3("Ambient Color", (float*)&material.m_ambient_color);
+        ImGui::ColorEdit3("Diffuse Color", (float*)&material.m_diffuse_color);
+        ImGui::ColorEdit3("Specular Color", (float*)&material.m_specular_color);
+
+        ImGui::SliderFloat("Specular Shininess", &material.m_specular_shininess, 1.0f, 512.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
     }
 
 }

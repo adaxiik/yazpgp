@@ -13,11 +13,18 @@ struct PointLight{
     float diffuse_intensity;
     float specular_intensity;
 };
+struct Material{
+    vec3 ambient_color;
+    vec3 diffuse_color;
+    vec3 specular_color;
+    float specular_shininess;
+};
 
 
 #define MAX_POINT_LIGHTS 4
 uniform int num_point_lights;
 uniform PointLight point_lights[MAX_POINT_LIGHTS];
+uniform Material material;
 
 uniform vec3 camera_position;
 uniform mat3 normal_matrix;
@@ -28,14 +35,14 @@ void main () {
     vec3 self_color = vec3(1.0);
     
     PointLight light = point_lights[0];
-    vec3 ambient_light = light.ambient_intensity * light.color;
+    vec3 ambient_light = light.ambient_intensity * light.color * material.ambient_color;
 
     vec3 normal = normalize(normal_matrix * vs_normal);
 
 
     vec3 light_direction = normalize(light.position - world_position);
     float diffuse_factor = max(dot(normal, light_direction), 0.0f);
-    vec3 diffuse_light = diffuse_factor * light.diffuse_intensity * light.color;
+    vec3 diffuse_light = diffuse_factor * light.diffuse_intensity * light.color * material.diffuse_color;
 
     frag_color = vec4(self_color * (ambient_light + diffuse_light), 1.0f);
     // frag_color = vec4(self_color * (specular_light), 1.0f);

@@ -17,6 +17,7 @@
 #include "shader.hpp"
 #include "renderable_entity.hpp"
 #include "io.hpp"
+#include "phong_blinn_material.hpp"
 
 #include "scene.hpp"
 
@@ -178,21 +179,15 @@ namespace yazpgp
             "assets/shaders/rtx/rtx.fs"
         );
 
-        auto tonk_big_mesh = io::load_mesh_from_file("assets/models/tonk_big.obj");
 
         auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
+
+
 
         // scenes
         std::vector<Scene> scenes;
 
-
-        // auto around_center = Transform::Mat4Compositor::Composite({
-        //     Transform::Mat4Compositor::Rotate({0, 10, 0}),
-        //     Transform::Mat4Compositor::Translate({0, 0, 0.1f}),
-        // });
-
         Transform::Mat4Compositor first_planet(Transform::Mat4Compositor::Composite({}));
-
         // Solar system scene
         scenes.push_back(std::move(
             Scene()
@@ -204,6 +199,7 @@ namespace yazpgp
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = phong_shader,
                 .mesh = ball_mesh,
+                .material = PhongBlinnMaterial::create_shared({0.f, 0.f, 0.8f}),
             })
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = normal_shader,
@@ -233,7 +229,6 @@ namespace yazpgp
             .add_light(
                 PointLight{
                     .position = {0.f, 5.f, 3.f},
-                    .color = {0.f, 0.f, 0.8f},
                 }
             )
         ));
@@ -246,6 +241,7 @@ namespace yazpgp
                 .mesh = tonk_mesh,
                 .textures = { tonk_texture },
                 .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
+                .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = white_shader,
@@ -263,6 +259,7 @@ namespace yazpgp
                 .shader = phong_textured_shader,
                 .mesh = mad_mesh,
                 .textures = { mad_texture },
+                .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = white_shader,
@@ -281,22 +278,26 @@ namespace yazpgp
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f})
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f})
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f})
+                    .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
+                    .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_light(
                 PointLight{}
@@ -308,7 +309,8 @@ namespace yazpgp
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({-5.0f, 0.0f, 0.0f})
+                    .transform = Transform::default_transform().translate({-5.0f, 0.0f, 0.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_light(
                 PointLight{}
@@ -321,22 +323,26 @@ namespace yazpgp
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f})
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = lambert_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f})
+                    .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = ambient_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f})
+                    .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = blinn_shader,
                     .mesh = ball_mesh,
-                    .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f})
+                    .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f}),
+                    .material = PhongBlinnMaterial::default_material(),
             })
             .add_light(
                 PointLight{}
@@ -349,7 +355,8 @@ namespace yazpgp
                 .shader = phong_textured_shader,
                 .mesh = tonk_mesh,
                 .textures = { tonk_texture },
-                .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f})
+                .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
+                .material = PhongBlinnMaterial::default_material(),
             })
             .add_light(
             PointLight{.position = {0.f, 3.f, 3.f}}
@@ -364,23 +371,12 @@ namespace yazpgp
                 .mesh = ball_mesh,
                 .textures = { cubemap_factory },
                 .transform = Transform::default_transform(),
+                // .material = PhongBlinnMaterial::default_material(),
             })
             .add_light(
                 PointLight{.position = {0.f, 3.f, 3.f}}
             )
             .set_skybox(skybox)
-        ));
-
-        scenes.push_back(std::move(
-            Scene()
-            .add_entity(Scene::SceneRenderableEntity{
-                    .shader = phong_shader,
-                    .mesh = tonk_big_mesh,
-                    .transform = Transform::default_transform()
-            })
-            .add_light(
-                PointLight{.position = {0.f, 3.f, 3.f}}
-            )
         ));
 
         float fov = 60.0f;

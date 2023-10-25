@@ -33,6 +33,7 @@ namespace yazpgp
         InputManager& input_manager();
         void set_relative_mouse_mode(bool enabled) const;
         double delta_time() const;
+        double time() const;
 
     private:
         WindowConfig m_config;

@@ -17,14 +17,15 @@ namespace yazpgp
         std::vector<std::shared_ptr<Texture>> m_textures;
         std::shared_ptr<Shader> m_shader;
         std::shared_ptr<Mesh> m_mesh;
-        std::function<void(const Scene&, double)> m_on_update;
+        std::function<glm::mat4(const glm::mat4&)> m_transform_modifier;
     public:
+        using TransformModifier = std::function<glm::mat4(const glm::mat4&)>;
         RenderableEntity(
             const std::shared_ptr<Shader>& shader,
             const std::shared_ptr<Mesh>& mesh,
             const std::vector<std::shared_ptr<Texture>>& textures = {},
             const Transform& transform = Transform::default_transform(),
-            std::function<void(const Scene&, double)> on_update = [](const Scene&, double) {}
+            TransformModifier transform_modifier = [](const glm::mat4& m) { return m; }
         );
 
         void render(

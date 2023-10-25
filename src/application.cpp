@@ -58,7 +58,7 @@ namespace yazpgp
         if (not m_window)
             return 1;
 
-        // Normal shader
+        // normal shader
         auto normal_shader = io::load_shader_from_file(
             "assets/shaders/normals/normals.vs",
             "assets/shaders/normals/normals.fs"
@@ -66,9 +66,14 @@ namespace yazpgp
         if (not normal_shader)
             return 1;
 
-        // Ball mesh
+        // ball mesh
         auto ball_mesh = io::load_mesh_from_file("assets/models/ball.obj");
         if (not ball_mesh)
+            return 1;
+        
+        // cube mesh
+        auto cube_mesh = io::load_mesh_from_file("assets/models/cube.obj");
+        if (not cube_mesh)
             return 1;
 
         // phone shader
@@ -173,10 +178,66 @@ namespace yazpgp
             "assets/shaders/rtx/rtx.fs"
         );
 
+        auto tonk_big_mesh = io::load_mesh_from_file("assets/models/tonk_big.obj");
+
         auto white_shader = Shader::create_default_shader(1.f, 1.f, 1.f, 1.f);
 
         // scenes
         std::vector<Scene> scenes;
+
+
+        // auto around_center = Transform::Mat4Compositor::Composite({
+        //     Transform::Mat4Compositor::Rotate({0, 10, 0}),
+        //     Transform::Mat4Compositor::Translate({0, 0, 0.1f}),
+        // });
+
+        Transform::Mat4Compositor first_planet(Transform::Mat4Compositor::Composite({}));
+
+        // Solar system scene
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = white_shader,
+                .mesh = grid_mesh,
+                .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = phong_shader,
+                .mesh = ball_mesh,
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = normal_shader,
+                .mesh = ball_mesh,
+                .transform_modifier = [&](const glm::mat4& m) {
+                    float angle = m_window->time() * 100;
+                    first_planet = Transform::Mat4Compositor::Composite({
+                        Transform::Mat4Compositor::Rotate({0, angle, 0}),
+                        Transform::Mat4Compositor::Translate({0, 0, 5}),
+                    })(m);
+                    return first_planet.compose();
+                }
+            })
+            .add_entity(Scene::SceneRenderableEntity{
+                .shader = normal_shader,
+                .mesh = ball_mesh,
+                .transform_modifier = [&](const glm::mat4& m) {
+                    float angle = m_window->time() * 150;
+                    return Transform::Mat4Compositor::Composite({
+                        Transform::Mat4Compositor::Composite({
+                            Transform::Mat4Compositor::Rotate({0, angle, 0}),
+                            Transform::Mat4Compositor::Translate({0, 0, 3}),
+                        }),
+                        first_planet,
+                    })(m);
+            }})
+            .add_light(
+                PointLight{
+                    .position = {0.f, 5.f, 3.f},
+                    .color = {0.f, 0.f, 0.8f},
+                }
+            )
+        ));
+
         
         scenes.push_back(std::move(
             Scene()
@@ -184,7 +245,7 @@ namespace yazpgp
                 .shader = phong_textured_shader,
                 .mesh = tonk_mesh,
                 .textures = { tonk_texture },
-                .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f})
+                .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
             })
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = white_shader,
@@ -308,6 +369,18 @@ namespace yazpgp
                 PointLight{.position = {0.f, 3.f, 3.f}}
             )
             .set_skybox(skybox)
+        ));
+
+        scenes.push_back(std::move(
+            Scene()
+            .add_entity(Scene::SceneRenderableEntity{
+                    .shader = phong_shader,
+                    .mesh = tonk_big_mesh,
+                    .transform = Transform::default_transform()
+            })
+            .add_light(
+                PointLight{.position = {0.f, 3.f, 3.f}}
+            )
         ));
 
         float fov = 60.0f;

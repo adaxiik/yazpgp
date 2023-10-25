@@ -26,5 +26,7 @@ namespace yazpgp
         void set_uniform(const std::string& name, const float value) const;
         void set_uniform(const std::string& name, const int value) const;
 
+        static void unuse();
+
     };
 }

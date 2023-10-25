@@ -8,13 +8,13 @@ namespace yazpgp
         const std::shared_ptr<Mesh>& mesh,
         const std::vector<std::shared_ptr<Texture>>& textures,
         const Transform& transform,
-        std::function<void(const Scene&, double)> on_update
+        TransformModifier transform_modifier
     )
         : m_transform(transform)
         , m_textures(textures)
         , m_shader(shader)
         , m_mesh(mesh)
-        , m_on_update(on_update)
+        , m_transform_modifier(transform_modifier)
     {
     }
 
@@ -29,9 +29,12 @@ namespace yazpgp
         const glm::vec3& camera_position
     ) const
     {
+        
+        auto modified_model_matrix = m_transform_modifier(m_transform.model_matrix());
+
         m_shader->use();
-        m_shader->set_uniform("model_matrix", m_transform.model_matrix());
-        m_shader->set_uniform("mvp_matrix", view_projection_matrix * m_transform.model_matrix());
+        m_shader->set_uniform("model_matrix", modified_model_matrix);
+        m_shader->set_uniform("mvp_matrix", view_projection_matrix * modified_model_matrix);
         m_shader->set_uniform("camera_position", camera_position);
         m_shader->set_uniform("num_point_lights", static_cast<int>(lights.size()));
         for (size_t i = 0; i < lights.size(); i++)
@@ -42,7 +45,7 @@ namespace yazpgp
             m_shader->set_uniform("point_lights[" + std::to_string(i) + "].diffuse_intensity", lights[i].diffuse_intensity);
             m_shader->set_uniform("point_lights[" + std::to_string(i) + "].specular_intensity", lights[i].specular_intensity);
         }
-        m_shader->set_uniform("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transform.model_matrix()))));
+        m_shader->set_uniform("normal_matrix", glm::mat3(glm::transpose(glm::inverse(modified_model_matrix))));
 
         for (size_t i = 0; i < m_textures.size(); i++)
             m_textures[i]->use(i);
@@ -54,7 +57,8 @@ namespace yazpgp
 
     void RenderableEntity::update(const Scene& scene, double delta_time)
     {
-        if (m_on_update)
-            m_on_update(scene, delta_time);
+        // TODOO
+        (void) scene;
+        (void) delta_time;
     }
 }

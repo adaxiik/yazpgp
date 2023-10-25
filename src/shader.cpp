@@ -149,5 +149,10 @@ namespace yazpgp
         // glUniform1i(location, value);
         glProgramUniform1i(m_program, location, value);
     }
+
+    void Shader::unuse()
+    {
+        glUseProgram(0);
+    }
     
 }

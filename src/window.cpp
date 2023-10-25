@@ -176,4 +176,9 @@ namespace yazpgp
     {
         return m_delta_time;
     }
+
+    double Window::time() const
+    {
+        return SDL_GetTicks() / 1000.0;
+    }
 }

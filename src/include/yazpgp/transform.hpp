@@ -130,16 +130,16 @@ namespace yazpgp
     //     }
 
 
-    //     // usage looks like this:
-    //     // entity->transform() = Transform::Compositor::Composite({
-    //     //     Transform::Compositor::Rotate({0, 1, 0}),
-    //     //     Transform::Compositor::Composite({
-    //     //         Transform::Compositor::Translate({0, 0, -0.5}),
-    //     //         Transform::Compositor::Rotate({0, 1, 0})
-    //     //     })
-    //     // })(entity->transform());
+        // usage looks like this:
+        // entity->transform() = Transform::Compositor::Composite({
+        //     Transform::Compositor::Rotate({0, 1, 0}),
+        //     Transform::Compositor::Composite({
+        //         Transform::Compositor::Translate({0, 0, -0.5}),
+        //         Transform::Compositor::Rotate({0, 1, 0})
+        //     })
+        // })(entity->transform());
 
-        struct Compositor
+        struct Mat4Compositor
         {
             struct TranslateData
             {
@@ -153,87 +153,103 @@ namespace yazpgp
             {
                 glm::vec3 scale;
             };
+
+            using Mat4Data = glm::mat4;
+            
             struct CompositeData
             {
-                std::vector<Compositor> compositor;
+                std::vector<Mat4Compositor> compositor;
             };
 
-            using CompositorVariant = std::variant<TranslateData, RotateData, ScaleData, CompositeData>;
+            using CompositorVariant = std::variant<TranslateData, RotateData, ScaleData, CompositeData, Mat4Data>;
             CompositorVariant compositor;
 
-            Compositor(const TranslateData &translate) : compositor(translate) {}
-            Compositor(const RotateData &rotate) : compositor(rotate) {}
-            Compositor(const ScaleData &scale) : compositor(scale) {}
-            Compositor(const CompositeData &composite) : compositor(composite) {}
+            Mat4Compositor(const TranslateData &translate) : compositor(translate) {}
+            Mat4Compositor(const RotateData &rotate) : compositor(rotate) {}
+            Mat4Compositor(const ScaleData &scale) : compositor(scale) {}
+            Mat4Compositor(const CompositeData &composite) : compositor(composite) {}
+            Mat4Compositor(const Mat4Data &mat4) : compositor(mat4) {}
 
-            Transform operator()(const Transform &transform) const
+            glm::mat4 operator()(const glm::mat4 &transform = glm::mat4(1.0f)) const
             {
-                auto c = transform.copy();
+                // auto c = transform.copy();
+                // return std::visit(CompositorVisitor{c}, compositor);
+                auto c = transform;
                 return std::visit(CompositorVisitor{c}, compositor);
             }
 
-            Transform operator()(Transform &&transform) const
+            glm::mat4 operator()(glm::mat4 &&transform) const
             {
                 return std::visit(CompositorVisitor{transform}, compositor);
             }
 
-            Transform compose(const Transform &transform) const
+            glm::mat4 compose(const glm::mat4 &transform = glm::mat4(1.0f)) const
             {
                 return (*this)(transform);
             }
-
             struct CompositorVisitor
             {
-                Transform &transform;
-                Transform operator()(const TranslateData &translate) const
+                glm::mat4 &transform;
+                glm::mat4 operator()(const TranslateData &translate) const
                 {
-                    return transform.translate(translate.translation);
+                    // return transform.translate(translate.translation);
+                    return glm::translate(transform, translate.translation);
                 }
-                Transform operator()(const RotateData &rotate) const
+                glm::mat4 operator()(const RotateData &rotate) const
                 {
-                    return transform.rotate(rotate.rotation);
+                    // return transform.rotate(rotate.rotation);
+                    return glm::rotate(transform, glm::radians(rotate.rotation.x), {1, 0, 0}) *
+                           glm::rotate(transform, glm::radians(rotate.rotation.y), {0, 1, 0}) *
+                           glm::rotate(transform, glm::radians(rotate.rotation.z), {0, 0, 1});
                 }
-                Transform operator()(const ScaleData &scale) const
+                glm::mat4 operator()(const ScaleData &scale) const
                 {
-                    return transform.scale(scale.scale);
+                    // return transform.scale(scale.scale);
+                    return glm::scale(transform, scale.scale);
                 }
-                Transform operator()(const CompositeData &composite) const
+
+                glm::mat4 operator()(const Mat4Data &mat4) const
                 {
-                    Transform result = transform;
+                    return mat4 * transform;
+                }
+
+                glm::mat4 operator()(const CompositeData &composite) const
+                {
+                    glm::mat4 result = transform;
                     for (const auto &compositor : composite.compositor)
                         result = compositor(result);
                     return result;
                 }
             };
 
-            static Compositor Translate(const glm::vec3 &translation)
+            static Mat4Compositor Translate(const glm::vec3 &translation)
             {
-                return Compositor(TranslateData{translation});
+                return Mat4Compositor(TranslateData{translation});
             }
 
-            static Compositor Rotate(const glm::vec3 &rotation)
+            static Mat4Compositor Rotate(const glm::vec3 &rotation)
             {
-                return Compositor(RotateData{rotation});
+                return Mat4Compositor(RotateData{rotation});
             }
 
-            static Compositor Scale(const glm::vec3 &scale)
+            static Mat4Compositor Scale(const glm::vec3 &scale)
             {
-                return Compositor(ScaleData{scale});
+                return Mat4Compositor(ScaleData{scale});
             }
 
-            static Compositor Composite(const std::vector<Compositor> &compositor)
+            static Mat4Compositor Composite(const std::vector<Mat4Compositor> &compositor)
             {
-                return Compositor(CompositeData{compositor});
+                return Mat4Compositor(CompositeData{compositor});
             }
 
-            static Compositor Composite(std::vector<Compositor> &&compositor)
+            static Mat4Compositor Composite(std::vector<Mat4Compositor> &&compositor)
             {
-                return Compositor(CompositeData{std::move(compositor)});
+                return Mat4Compositor(CompositeData{std::move(compositor)});
             }
 
-            static Compositor Composite(std::initializer_list<Compositor> compositor)
+            static Mat4Compositor Composite(std::initializer_list<Mat4Compositor> compositor)
             {
-                return Compositor(CompositeData{compositor});
+                return Mat4Compositor(CompositeData{compositor});
             }
         };
     };

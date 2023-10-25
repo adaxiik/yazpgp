@@ -23,7 +23,7 @@ namespace yazpgp
                 entity.mesh,
                 entity.textures,
                 entity.transform,
-                entity.on_update
+                entity.transform_modifier
             ));
         }
     }
@@ -61,7 +61,7 @@ namespace yazpgp
             entity.mesh,
             entity.textures,
             entity.transform,
-            entity.on_update
+            entity.transform_modifier
         ));
         return *this;
     }

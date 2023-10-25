@@ -20,7 +20,7 @@ namespace yazpgp
             std::shared_ptr<Mesh> mesh;
             std::vector<std::shared_ptr<Texture>> textures = {};
             Transform transform = Transform::default_transform();
-            std::function<void(const Scene&, double)> on_update = [](const Scene&, double) {};
+            RenderableEntity::TransformModifier transform_modifier = [](const glm::mat4& m) { return m; };
         };
         Scene();
         Scene(std::vector<std::unique_ptr<RenderableEntity>> entities);

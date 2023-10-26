@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include <iostream>
 namespace yazpgp
 {
     template <typename T>
-    class EventSource
+    class EventDistributor
     {
     public:
         using Observer = std::function<void(const T&)>;

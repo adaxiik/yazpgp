@@ -17,7 +17,7 @@ namespace yazpgp
             ImGui::SetWindowCollapsed(true, ImGuiCond_Once); 
 
             camera_component(scene.m_camera);   
-            lights_component(scene.m_lights);
+            lights_component(*scene.m_lights);
             entities_component(scene.m_entities);
         }   
         ImGui::End();
@@ -45,11 +45,16 @@ namespace yazpgp
         for (auto& light : lights)
         {
             ImGui::PushID(&light);
-            ImGui::DragFloat3("Position", (float*)&light.position);
-            ImGui::ColorEdit3("Color", (float*)&light.color);
-            ImGui::SliderFloat("Ambient Intensity", &light.ambient_intensity, 0.0f, 2.0f);
-            ImGui::SliderFloat("Diffuse Intensity", &light.diffuse_intensity, 0.0f, 2.0f);
-            ImGui::SliderFloat("Specular Intensity", &light.specular_intensity, 0.0f, 2.0f);
+            auto sliders = {ImGui::DragFloat3("Position", (float*)&light.position),
+                ImGui::ColorEdit3("Color", (float*)&light.color),
+                ImGui::SliderFloat("Ambient Intensity", &light.ambient_intensity, 0.0f, 2.0f),
+                ImGui::SliderFloat("Diffuse Intensity", &light.diffuse_intensity, 0.0f, 2.0f),
+                ImGui::SliderFloat("Specular Intensity", &light.specular_intensity, 0.0f, 2.0f)
+            };
+            
+            if (std::any_of(sliders.begin(), sliders.end(), [](bool b) { return b; }))
+                light.notify(light);
+
             ImGui::PopID();
         }
     }

@@ -33,11 +33,7 @@ namespace yazpgp
             TransformModifier transform_modifier = [](const glm::mat4& m) { return m; }
         );
 
-        void render(
-            const glm::mat4& view_projection_matrix,
-            const std::vector<PointLight>& lights,
-            const glm::vec3& camera_position
-        ) const;
+        void render(const glm::mat4& view_projection_matrix) const;
 
         void update(const Scene& scene, double delta_time);
         

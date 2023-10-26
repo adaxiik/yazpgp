@@ -2,12 +2,12 @@
 #include <glm/glm.hpp>
 
 #include "input_manager.hpp"
-#include "event_source.hpp"
+#include "event_producer.hpp"
 #include "debug/debug_ui_def.hpp"
 
 namespace yazpgp
 {
-    class Camera
+    class Camera : public EventProducer<Camera>
     {
         ENABLE_DEBUG_UI();
         

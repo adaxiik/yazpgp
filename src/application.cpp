@@ -201,11 +201,11 @@ namespace yazpgp
                 .mesh = ball_mesh,
                 .material = PhongBlinnMaterial::create_shared({0.f, 0.f, 0.8f}),
                 .transform_modifier = [&](const glm::mat4& m) {
-                    float angle = m_window->time() * 50;
+                    // float angle = m_window->time() * 50;
                     center_planet = m;
                     return m;
                 }
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = normal_shader,
                 .mesh = ball_mesh,
@@ -233,9 +233,7 @@ namespace yazpgp
                     })(m);
             }})
             .add_light(
-                PointLight{
-                    .position = {0.f, 5.f, 3.f},
-                }
+                PointLight().set_position({0.f, 5.f, 3.f})
             )
         ));
 
@@ -248,14 +246,14 @@ namespace yazpgp
                 .textures = { tonk_texture },
                 .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
                 .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = white_shader,
                 .mesh = grid_mesh,
                 .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
             })
             .add_light(
-                PointLight{}
+                PointLight()
             )
         ));
 
@@ -266,16 +264,14 @@ namespace yazpgp
                 .mesh = mad_mesh,
                 .textures = { mad_texture },
                 .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                 .shader = white_shader,
                 .mesh = grid_mesh,
                 .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
             })
             .add_light(
-                PointLight{
-                    .position = {0.f, 5.f, 3.f},
-                }
+                PointLight().set_position({0.f, 5.f, 3.f})
             )
         ));
 
@@ -286,27 +282,27 @@ namespace yazpgp
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = phong_shader,
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_light(
-                PointLight{}
+                PointLight()
             )
         ));
 
@@ -317,9 +313,9 @@ namespace yazpgp
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({-5.0f, 0.0f, 0.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_light(
-                PointLight{}
+                PointLight()
             )
         ));
 
@@ -331,27 +327,27 @@ namespace yazpgp
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = lambert_shader,
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = ambient_shader,
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_entity(Scene::SceneRenderableEntity{
                     .shader = blinn_shader,
                     .mesh = ball_mesh,
                     .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f}),
                     .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
             .add_light(
-                PointLight{}
+                PointLight()
             )
         ));
 
@@ -363,9 +359,9 @@ namespace yazpgp
                 .textures = { tonk_texture },
                 .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
                 .material = PhongBlinnMaterial::default_material(),
-            })
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader )
             .add_light(
-            PointLight{.position = {0.f, 3.f, 3.f}}
+                PointLight().set_position({0.f, 3.f, 3.f})
             )
             .set_skybox(skybox)
         ));
@@ -379,9 +375,6 @@ namespace yazpgp
                 .transform = Transform::default_transform(),
                 // .material = PhongBlinnMaterial::default_material(),
             })
-            .add_light(
-                PointLight{.position = {0.f, 3.f, 3.f}}
-            )
             .set_skybox(skybox)
         ));
 
@@ -426,12 +419,19 @@ namespace yazpgp
         m_window->input_manager().add_listener(
             KeyDownEvent::Callback{[&](KeyDownEvent event) {
                 if (event.key == Key::RIGHT)
+                {
                     current_scene = (current_scene + 1) % scenes.size();
+                    scenes[current_scene].invoke_distributors();
+                }
                 else if (event.key == Key::LEFT)
+                {
                     current_scene = (current_scene + scenes.size() - 1) % scenes.size();
+                    scenes[current_scene].invoke_distributors();
+                }
             }}
         );
-
+        scenes[current_scene].invoke_distributors();
+        
         while (m_window->is_running())
         {
             auto& scene = scenes[current_scene];

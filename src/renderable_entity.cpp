@@ -25,11 +25,7 @@ namespace yazpgp
         return m_transform;
     }
 
-    void RenderableEntity::render(
-        const glm::mat4& view_projection_matrix,
-        const std::vector<PointLight>& lights,
-        const glm::vec3& camera_position
-    ) const
+    void RenderableEntity::render(const glm::mat4& view_projection_matrix) const
     {
         
         auto modified_model_matrix = m_transform_modifier(m_transform.model_matrix());
@@ -37,16 +33,9 @@ namespace yazpgp
         m_shader->use();
         m_shader->set_uniform("model_matrix", modified_model_matrix);
         m_shader->set_uniform("mvp_matrix", view_projection_matrix * modified_model_matrix);
-        m_shader->set_uniform("camera_position", camera_position);
-        m_shader->set_uniform("num_point_lights", static_cast<int>(lights.size()));
-        for (size_t i = 0; i < lights.size(); i++)
-        {
-            m_shader->set_uniform("point_lights[" + std::to_string(i) + "].position", lights[i].position);
-            m_shader->set_uniform("point_lights[" + std::to_string(i) + "].color", lights[i].color);
-            m_shader->set_uniform("point_lights[" + std::to_string(i) + "].ambient_intensity", lights[i].ambient_intensity);
-            m_shader->set_uniform("point_lights[" + std::to_string(i) + "].diffuse_intensity", lights[i].diffuse_intensity);
-            m_shader->set_uniform("point_lights[" + std::to_string(i) + "].specular_intensity", lights[i].specular_intensity);
-        }
+        // m_shader->set_uniform("camera_position", camera_position);
+        // m_shader->set_uniform("num_point_lights", static_cast<int>(lights.size()));
+        
         m_shader->set_uniform("normal_matrix", glm::mat3(glm::transpose(glm::inverse(modified_model_matrix))));
         
         if (m_material)

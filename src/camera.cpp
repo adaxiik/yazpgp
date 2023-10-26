@@ -127,6 +127,9 @@ namespace yazpgp
     
         m_speed = original_speed;
 
+        if (m_update)
+            notify(*this);
+
         if (not input.relative_mouse_mode())
             return;
 

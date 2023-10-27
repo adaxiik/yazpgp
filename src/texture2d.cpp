@@ -1,6 +1,6 @@
 #include "texture_2d.hpp"
 #include "logger.hpp"
-
+#include <iostream>
 namespace yazpgp
 {
     Texture2D::Texture2D(const char* bytes, uint32_t width, uint32_t height, uint32_t channels)
@@ -26,7 +26,6 @@ namespace yazpgp
     void Texture2D::use(uint32_t texture_slot) const
     {
         YAZPGP_LOG_FATAL_IF(texture_slot > 31, "Texture slot must be between 0 and 31");
-
         glActiveTexture(GL_TEXTURE0 + texture_slot);
         glBindTexture(GL_TEXTURE_2D, m_texture);
     }

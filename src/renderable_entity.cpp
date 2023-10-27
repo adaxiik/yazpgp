@@ -33,9 +33,6 @@ namespace yazpgp
         m_shader->use();
         m_shader->set_uniform("model_matrix", modified_model_matrix);
         m_shader->set_uniform("mvp_matrix", view_projection_matrix * modified_model_matrix);
-        // m_shader->set_uniform("camera_position", camera_position);
-        // m_shader->set_uniform("num_point_lights", static_cast<int>(lights.size()));
-        
         m_shader->set_uniform("normal_matrix", glm::mat3(glm::transpose(glm::inverse(modified_model_matrix))));
         
         if (m_material)

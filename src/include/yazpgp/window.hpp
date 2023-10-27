@@ -34,6 +34,8 @@ namespace yazpgp
         void set_relative_mouse_mode(bool enabled) const;
         double delta_time() const;
         double time() const;
+        int width() const;
+        int height() const;
 
     private:
         WindowConfig m_config;
@@ -42,5 +44,7 @@ namespace yazpgp
         InputManager m_input_manager;
         bool m_is_running;
         double m_delta_time;
+        int m_width;
+        int m_height;
     };
 }

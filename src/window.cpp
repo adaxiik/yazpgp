@@ -143,6 +143,8 @@ namespace yazpgp
 
         m_input_manager.add_listener(WindowResizeEvent::Callback{[this](WindowResizeEvent event) {
             glViewport(0, 0, event.width, event.height);
+            m_width = event.width;
+            m_height = event.height;
         }});
     }
 
@@ -180,5 +182,15 @@ namespace yazpgp
     double Window::time() const
     {
         return SDL_GetTicks() / 1000.0;
+    }
+
+    int Window::width() const
+    {
+        return m_width;
+    }
+
+    int Window::height() const
+    {
+        return m_height;
     }
 }

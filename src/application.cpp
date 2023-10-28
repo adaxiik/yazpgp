@@ -70,10 +70,16 @@ namespace yazpgp
         if (not meshes.add("grid", io::load_mesh_from_file("assets/models/grid20m20x20.obj"))) return 1;
         if (not meshes.add("mad", io::load_mesh_from_file("assets/models/mad.obj"))) return 1;
         if (not meshes.add("plane", io::load_mesh_from_file("assets/models/plane.obj"))) return 1;
+        if (not meshes.add("tree", io::load_mesh_from_file("assets/models/tree.obj"))) return 1;
+        if (not meshes.add("bush", io::load_mesh_from_file("assets/models/bush.obj"))) return 1;
+        if (not meshes.add("suzi", io::load_mesh_from_file("assets/models/suzi.obj"))) return 1;
+        if (not meshes.add("rat", io::load_mesh_from_file("assets/models/rat.obj"))) return 1;
+
 
         if (not textures.add("tonk", io::load_texture_from_file("assets/textures/tonk_diff.png"))) return 1;
         if (not textures.add("mad", io::load_texture_from_file("assets/textures/mad.png"))) return 1;
         if (not textures.add("grass", io::load_texture_from_file("assets/textures/grass.png"))) return 1;
+        if (not textures.add("rat", io::load_texture_from_file("assets/textures/rat_diff.jpg"))) return 1;
 
         if (not shaders.add("white", Shader::create_default_shader(1.f, 1.f, 1.f, 1.f))) return 1;
 
@@ -325,6 +331,12 @@ namespace yazpgp
             scene.update(m_window->input_manager(), m_window->delta_time());
             scene.render(projection_matrix);
             DebugUI::scene_window(scene);
+
+            ImGui::Begin("Info");
+            ImGui::Text("FPS: %.2f", 1.f / m_window->delta_time());
+            ImGui::Text("Imgui FPS: %.2f", ImGui::GetIO().Framerate);
+            ImGui::End();
+
 
             this->frame();
         }

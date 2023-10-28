@@ -1,6 +1,8 @@
 #include "demo_scenes.hpp"
 #include "phong_blinn_material.hpp"
 
+#include <random>
+
 namespace yazpgp::DemoScenes
 {
     Scene phong_four_balls(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders)
@@ -210,20 +212,131 @@ namespace yazpgp::DemoScenes
     {
         Scene s;
         const auto phong_textured_shader = shaders["phong_textured"];
+        const auto blinn_shader = shaders["blinn"];
+        const auto rtx_shader = shaders["rtx"];
         const auto plane_mesh = meshes["plane"];
+        const auto tree_mesh = meshes["tree"];
+        const auto tree_texture = textures["mad"];
+        const auto bush_mesh = meshes["bush"];
+        const auto ball_mesh = meshes["ball"];
+        const auto suzi_mesh = meshes["suzi"];
+        const auto normal_shader = shaders["normal"];
+        const auto tonk_mesh = meshes["tonk"];
+        const auto tonk_texture = textures["tonk"];
+        const auto rat_mesh = meshes["rat"];
+        const auto rat_texture = textures["rat"];
 
 
         s.add_entity(Scene::SceneRenderableEntity{
             .shader = phong_textured_shader,
             .mesh = plane_mesh,
             .textures = {textures["grass"]},
-            .transform = Transform::default_transform().translate({0.f, 0.f, 0.f}).scale({10.f, 10.f, 10.f}),
+            .transform = Transform::default_transform().translate({0.f, 0.f, 0.f}).scale({20.f, 1.f, 20.f}),
             .material = PhongBlinnMaterial::default_material(),
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
         .add_light(
             PointLight().set_position({0.f, 50.f, 50.f})
         );
         
+        std::mt19937 gen(69);
+        std::uniform_real_distribution<> dis(-15.0, 15.0);
+        std::uniform_real_distribution<> scale_dis(0.5, 1.5);
+        std::uniform_real_distribution<> rot_dis(0.0, 360.0);
+
+        for (int i = 0; i < 30; i++)
+        {
+            float scale = scale_dis(gen);
+            s.add_entity(Scene::SceneRenderableEntity{
+                .shader = phong_textured_shader,
+                .mesh = tree_mesh,
+                .textures = {tree_texture},
+                .transform = Transform::default_transform()
+                    .translate({dis(gen), 0.f, dis(gen)})
+                    .scale({scale, scale, scale})
+                    .rotate({0.f, rot_dis(gen), 0.f}),
+                .material = PhongBlinnMaterial::default_material(),
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+        
+
+            s.add_entity(Scene::SceneRenderableEntity{
+                .shader = phong_textured_shader,
+                .mesh = bush_mesh,
+                .textures = {tree_texture},
+                .transform = Transform::default_transform()
+                    .translate({dis(gen), 0.f, dis(gen)})
+                    .scale({scale+1.0f, scale+1.0f, scale+1.0f})
+                    .rotate({0.f, rot_dis(gen), 0.f}),
+                .material = PhongBlinnMaterial::default_material(),
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+        
+        }
+
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = rtx_shader,
+            .mesh = ball_mesh,
+            .transform = Transform::default_transform().translate({0.f, 10.f, 0.f}),
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_entity(Scene::SceneRenderableEntity{
+            .shader = phong_textured_shader,
+            .mesh = tonk_mesh,
+            .textures = {tonk_texture},
+            .transform = Transform::default_transform()
+                .translate({0.f, 2.2f, 0.f})
+                .rotate({-90.f, 0.f, 0.f})
+                .scale({0.3f, 0.3f, 0.3f}),
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_entity(Scene::SceneRenderableEntity{
+            .shader = phong_textured_shader,
+            .mesh = rat_mesh,
+            .textures = {rat_texture},
+            .transform = Transform::default_transform().translate({0.f, 0.f, 3.f}),
+            .material = PhongBlinnMaterial::default_material(),
+            .transform_modifier = [&](const glm::mat4& m) {
+                static float angle = 0.f;
+                angle += 0.5f;
+                return Transform::Mat4Compositor::Composite({
+                    Transform::Mat4Compositor::Rotate({0, angle, 0}),
+                    m
+                })();
+            }
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+
+
+        constexpr int num_balls = 100;
+        constexpr float rot = 360.f / num_balls;
+
+        for (int i = 0; i < num_balls; i++)
+        {
+            const float pos_x = 10.f * std::cos(glm::radians(rot * i));
+            const float pos_z = 10.f * std::sin(glm::radians(rot * i)); 
+
+            if (i % 2)
+            {
+                s.add_entity(Scene::SceneRenderableEntity{
+                    .shader = blinn_shader,
+                    .mesh = ball_mesh,
+                    .textures = {tree_texture},
+                    .transform = Transform::default_transform().translate({pos_x, 2.f, pos_z}).scale({0.3f, 0.3f, 0.3f}),
+                    .material = PhongBlinnMaterial::default_material(),
+                }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+            }
+            else
+            {
+                s.add_entity(Scene::SceneRenderableEntity{
+                    .shader = normal_shader,
+                    .mesh = suzi_mesh,
+                    .transform = Transform::default_transform()
+                        .translate({pos_x, 2.f, pos_z})
+                        .scale({0.3f, 0.3f, 0.3f})
+                        .rotate({0.f, -rot * i - 90, 0.f}),
+                    .material = PhongBlinnMaterial::default_material(),
+                });
+            }
+            
+        }
+
 
         return s;
     }

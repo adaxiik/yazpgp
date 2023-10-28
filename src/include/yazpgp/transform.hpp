@@ -68,76 +68,15 @@ namespace yazpgp
         {
             return Transform(*this).scale(scale);
         }
-    
-
-    // class Transform
-    // {
-    //     glm::mat4 m_matrix;
-
-    // public:
-    //     const glm::mat4 &model_matrix() const
-    //     {
-    //         return m_matrix;
-    //     }
-
-    //     Transform copy() const
-    //     {
-    //         return Transform(*this);
-    //     }
-
-    //     Transform() : m_matrix(glm::mat4(1.0f)) {}
-
-    //     Transform(const glm::mat4 &matrix) : m_matrix(matrix) {}
-
-    //     Transform &translate(const glm::vec3 &translation)
-    //     {
-    //         m_matrix = glm::translate(m_matrix, translation);
-    //         return *this;
-    //     }
-
-    //     Transform &rotate(const glm::vec3 &rotation)
-    //     {
-    //         m_matrix = glm::rotate(m_matrix, glm::radians(rotation.x), {1, 0, 0});
-    //         m_matrix = glm::rotate(m_matrix, glm::radians(rotation.y), {0, 1, 0});
-    //         m_matrix = glm::rotate(m_matrix, glm::radians(rotation.z), {0, 0, 1});
-    //         return *this;
-    //     }
-
-    //     Transform &scale(const glm::vec3 &scale)
-    //     {
-    //         m_matrix = glm::scale(m_matrix, scale);
-    //         return *this;
-    //     }
-
-    //     Transform translate_copy(const glm::vec3 &translation) const
-    //     {
-    //         return Transform(*this).translate(translation);
-    //     }
-
-    //     Transform rotate_copy(const glm::vec3 &rotation) const
-    //     {
-    //         return Transform(*this).rotate(rotation);
-    //     }
-
-    //     Transform scale_copy(const glm::vec3 &scale) const
-    //     {
-    //         return Transform(*this).scale(scale);
-    //     }
-
-    //     static Transform default_transform()
-    //     {
-    //         return Transform();
-    //     }
-
 
         // usage looks like this:
-        // entity->transform() = Transform::Compositor::Composite({
-        //     Transform::Compositor::Rotate({0, 1, 0}),
-        //     Transform::Compositor::Composite({
-        //         Transform::Compositor::Translate({0, 0, -0.5}),
-        //         Transform::Compositor::Rotate({0, 1, 0})
-        //     })
-        // })(entity->transform());
+        // glm::mat4 output_mat = Transform::Mat4Compositor::Composite({
+        //     Transform::Mat4Compositor::Composite({
+        //         Transform::Mat4Compositor::Rotate({0, angle, 0}),
+        //         Transform::Mat4Compositor::Translate({0, 0, 8}),
+        //     }),
+        //     Transform::Mat4Compositor::Translate({0, 0, -8}),
+        // })(input_mat);
 
         struct Mat4Compositor
         {

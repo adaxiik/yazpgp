@@ -235,8 +235,9 @@ namespace yazpgp::DemoScenes
             .material = PhongBlinnMaterial::default_material(),
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
         .add_light(
-            PointLight().set_position({0.f, 50.f, 50.f})
-        );
+            PointLight().set_position({0.f, 50.f, 50.f}).set_illumination_radius(1000.f)
+        )
+        .camera().move_up(5.f);
         
         std::mt19937 gen(69);
         std::uniform_real_distribution<> dis(-15.0, 15.0);

@@ -65,6 +65,7 @@ namespace yazpgp
                     shader->set_uniform("point_lights[" + std::to_string(i) + "].ambient_intensity", (*lights)[i].ambient_intensity);
                     shader->set_uniform("point_lights[" + std::to_string(i) + "].diffuse_intensity", (*lights)[i].diffuse_intensity);
                     shader->set_uniform("point_lights[" + std::to_string(i) + "].specular_intensity", (*lights)[i].specular_intensity);
+                    shader->set_uniform("point_lights[" + std::to_string(i) + "].illumination_radius", (*lights)[i].illumination_radius);
                 }
             });
         }

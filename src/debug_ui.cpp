@@ -45,11 +45,13 @@ namespace yazpgp
         for (auto& light : lights)
         {
             ImGui::PushID(&light);
-            auto sliders = {ImGui::DragFloat3("Position", (float*)&light.position),
+            auto sliders = {
+                ImGui::DragFloat3("Position", (float*)&light.position),
                 ImGui::ColorEdit3("Color", (float*)&light.color),
                 ImGui::SliderFloat("Ambient Intensity", &light.ambient_intensity, 0.0f, 2.0f),
                 ImGui::SliderFloat("Diffuse Intensity", &light.diffuse_intensity, 0.0f, 2.0f),
-                ImGui::SliderFloat("Specular Intensity", &light.specular_intensity, 0.0f, 2.0f)
+                ImGui::SliderFloat("Specular Intensity", &light.specular_intensity, 0.0f, 2.0f),
+                ImGui::SliderFloat("Illumination Radius", &light.illumination_radius, 0.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic)
             };
             
             if (std::any_of(sliders.begin(), sliders.end(), [](bool b) { return b; }))

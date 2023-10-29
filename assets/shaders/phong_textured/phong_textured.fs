@@ -12,6 +12,7 @@ struct PointLight{
     float ambient_intensity;
     float diffuse_intensity;
     float specular_intensity;
+    float illumination_radius;
 };
 
 struct Material{
@@ -40,6 +41,8 @@ void main () {
 
     vec3 normal = normalize(normal_matrix * vs_normal);
 
+    float distance = length(light.position - world_position);
+    float illumination_factor = max(1.0f - distance / light.illumination_radius * 2.0f, 0.0f);
 
     vec3 light_direction = normalize(light.position - world_position);
     float diffuse_factor = max(dot(normal, light_direction), 0.0f);
@@ -55,6 +58,6 @@ void main () {
     vec3 specular_light = specular_factor * light.specular_intensity * light.color * material.specular_color;
 
 
-    frag_color = vec4(self_color * (ambient_light + diffuse_light + specular_light), 1.0f);
+    frag_color = vec4(self_color * (ambient_light + (diffuse_light + specular_light) * illumination_factor), 1.0f);
     // frag_color = vec4(self_color * (specular_light), 1.0f);
 }

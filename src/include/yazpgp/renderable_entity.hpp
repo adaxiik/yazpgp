@@ -6,7 +6,7 @@
 #include "mesh.hpp"
 #include "texture.hpp"
 #include "transform.hpp"
-#include "light.hpp"
+#include "lights/light.hpp"
 #include "material.hpp"
 #include "debug/debug_ui_def.hpp"
 namespace yazpgp

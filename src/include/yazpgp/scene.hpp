@@ -3,7 +3,7 @@
 #include "renderable_entity.hpp"
 #include "camera.hpp"
 #include "input_manager.hpp"
-#include "light.hpp"
+#include "lights/light.hpp"
 #include "skybox.hpp"
 #include "material.hpp"
 #include "debug/debug_ui_def.hpp"
@@ -46,6 +46,8 @@ namespace yazpgp
         Scene& add_entity(std::unique_ptr<RenderableEntity> entity);
         Scene& add_entity(const SceneRenderableEntity& entity, AddEntityOptions options = AddEntityOptions::None);
         Scene& add_light(const PointLight& light);
+        Scene& add_light(const SpotLight& light);
+        Scene& add_light(const DirectionalLight& light);
         Scene& set_skybox(std::shared_ptr<Skybox> skybox);
 
         auto begin() { return m_entities.begin(); }
@@ -60,9 +62,13 @@ namespace yazpgp
     private:
         Camera m_camera;
         std::vector<std::unique_ptr<RenderableEntity>> m_entities;
-        std::unique_ptr<std::vector<PointLight>> m_lights;
+        std::unique_ptr<std::vector<PointLight>> m_point_lights;
+        std::unique_ptr<std::vector<SpotLight>> m_spot_lights;
+        std::unique_ptr<std::vector<DirectionalLight>> m_directional_lights;
         std::unique_ptr<EventDistributor<Camera>> m_camera_event_distributor;
-        std::unique_ptr<EventDistributor<PointLight>> m_light_event_distributor;
+        std::unique_ptr<EventDistributor<PointLight>> m_point_light_event_distributor;
+        std::unique_ptr<EventDistributor<SpotLight>> m_spot_light_event_distributor;
+        std::unique_ptr<EventDistributor<DirectionalLight>> m_directional_light_event_distributor;
         std::shared_ptr<Skybox> m_skybox;
 
     };

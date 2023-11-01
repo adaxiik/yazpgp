@@ -5,7 +5,7 @@ namespace yazpgp
 {
     struct PointLight : public EventProducer<PointLight>
     {
-        constexpr static auto MAX_LIGHTS = 4;
+        constexpr static auto MAX_POINT_LIGHTS = 4;
 
         glm::vec3 position = glm::vec3(0.0f);
         glm::vec3 color = glm::vec3(1.0f);

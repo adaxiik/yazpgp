@@ -3,12 +3,24 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "logger.hpp"
 #include <iostream>
+
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+ 
+
+
 namespace yazpgp
 {
     Scene::Scene() 
-    : m_lights(std::make_unique<std::vector<PointLight>>())
+    : m_point_lights(std::make_unique<std::vector<PointLight>>())
+    , m_spot_lights(std::make_unique<std::vector<SpotLight>>())
+    , m_directional_lights(std::make_unique<std::vector<DirectionalLight>>())
     , m_camera_event_distributor(std::make_unique<EventDistributor<Camera>>())
-    , m_light_event_distributor(std::make_unique<EventDistributor<PointLight>>())
+    , m_point_light_event_distributor(std::make_unique<EventDistributor<PointLight>>())
+    , m_spot_light_event_distributor(std::make_unique<EventDistributor<SpotLight>>())
+    , m_directional_light_event_distributor(std::make_unique<EventDistributor<DirectionalLight>>())
     {
         m_camera.set_notify_callback([event_distributor = m_camera_event_distributor.get()](const Camera& camera)
         {
@@ -56,18 +68,33 @@ namespace yazpgp
 
         if (options & AddEntityOptions::PassLightToShader)
         {
-            m_light_event_distributor->subscribe([shader = entity.shader.get(), lights = m_lights.get()](const PointLight& )
+            m_point_light_event_distributor->subscribe([shader = entity.shader.get(), lights = m_point_lights.get()](const PointLight& light)
             {
                 for (size_t i = 0; i < lights->size(); i++)
-                {
-                    shader->set_uniform("point_lights[" + std::to_string(i) + "].position", (*lights)[i].position);
-                    shader->set_uniform("point_lights[" + std::to_string(i) + "].color", (*lights)[i].color);
-                    shader->set_uniform("point_lights[" + std::to_string(i) + "].ambient_intensity", (*lights)[i].ambient_intensity);
-                    shader->set_uniform("point_lights[" + std::to_string(i) + "].diffuse_intensity", (*lights)[i].diffuse_intensity);
-                    shader->set_uniform("point_lights[" + std::to_string(i) + "].specular_intensity", (*lights)[i].specular_intensity);
-                    shader->set_uniform("point_lights[" + std::to_string(i) + "].illumination_radius", (*lights)[i].illumination_radius);
-                }
+                    LightUseVisitor{ *shader, i }(light);
+                
+                shader->set_uniform("light.num_point_lights", static_cast<int>(lights->size()));
             });
+
+            m_spot_light_event_distributor->subscribe([shader = entity.shader.get(), lights = m_spot_lights.get()](const SpotLight& light)
+            {
+                for (size_t i = 0; i < lights->size(); i++)
+                    LightUseVisitor{ *shader, i }(light);
+                
+                shader->set_uniform("light.num_spot_lights", static_cast<int>(lights->size()));
+            });
+
+            m_directional_light_event_distributor->subscribe([shader = entity.shader.get(), lights = m_directional_lights.get()](const DirectionalLight& light)
+            {
+                for (size_t i = 0; i < lights->size(); i++)
+                    LightUseVisitor{ *shader, i }(light);
+                
+                shader->set_uniform("light.num_directional_lights", static_cast<int>(lights->size()));
+            });
+
+            entity.shader->set_uniform("light.num_point_lights", static_cast<int>(m_point_lights->size()));
+            entity.shader->set_uniform("light.num_spot_lights", static_cast<int>(m_spot_lights->size()));
+            entity.shader->set_uniform("light.num_directional_lights", static_cast<int>(m_directional_lights->size()));
         }
 
         m_entities.push_back(std::make_unique<RenderableEntity>(
@@ -83,23 +110,67 @@ namespace yazpgp
 
     Scene& Scene::add_light(const PointLight& light)
     {
-        if (m_lights->size() >= PointLight::MAX_LIGHTS)
+        if (m_point_lights->size() >= PointLight::MAX_POINT_LIGHTS)
         {
             YAZPGP_LOG_WARN("Maximum number of lights reached, ignoring light");
             return *this;
         }
 
         auto copy = light;
-        copy.set_notify_callback([event_distributor = m_light_event_distributor.get()](const PointLight& light)
+        copy.set_notify_callback([event_distributor = m_point_light_event_distributor.get()](const PointLight& light)
         {
             event_distributor->notify(light);
         });
 
-        m_lights->push_back(copy);
-        m_light_event_distributor->notify(copy);
+        m_point_lights->push_back(copy);
+        m_point_light_event_distributor->notify(copy);
 
         return *this;
     }
+
+    Scene& Scene::add_light(const SpotLight& light)
+    {
+        if (m_spot_lights->size() >= SpotLight::MAX_SPOT_LIGHTS)
+        {
+            YAZPGP_LOG_WARN("Maximum number of lights reached, ignoring light");
+            return *this;
+        }
+
+        auto copy = light;
+
+        copy.set_notify_callback([event_distributor = m_spot_light_event_distributor.get()](const SpotLight& light)
+        {
+            event_distributor->notify(light);
+        });
+
+        m_spot_lights->push_back(copy);
+        m_spot_light_event_distributor->notify(copy);
+
+        return *this;
+    }
+
+    Scene& Scene::add_light(const DirectionalLight& light)
+    {
+        if (m_directional_lights->size() >= DirectionalLight::MAX_DIRECTIONAL_LIGHTS)
+        {
+            YAZPGP_LOG_WARN("Maximum number of lights reached, ignoring light");
+            return *this;
+        }
+
+        auto copy = light;
+
+        copy.set_notify_callback([event_distributor = m_directional_light_event_distributor.get()](const DirectionalLight& light)
+        {
+            event_distributor->notify(light);
+        });
+
+        m_directional_lights->push_back(copy);
+        m_directional_light_event_distributor->notify(copy);
+
+        return *this;
+    }
+
+
 
     Scene& Scene::set_skybox(std::shared_ptr<Skybox> skybox)
     {
@@ -115,8 +186,15 @@ namespace yazpgp
     Scene& Scene::invoke_distributors()
     {
         m_camera_event_distributor->notify(m_camera);
-        for (const auto& light : *m_lights)
-            m_light_event_distributor->notify(light);
+        for (const auto& light : *m_point_lights)
+            m_point_light_event_distributor->notify(light);
+
+        for (const auto& light : *m_spot_lights)
+            m_spot_light_event_distributor->notify(light);
+        
+        for (const auto& light : *m_directional_lights)
+            m_directional_light_event_distributor->notify(light);
+            
         return *this;
     }
 }

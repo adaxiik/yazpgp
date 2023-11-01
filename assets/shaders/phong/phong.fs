@@ -146,8 +146,10 @@ float spot_light_cone(SpotLight light, vec3 light_direction){
     float cos_angle = dot(light.direction, -light_direction);
     if (cos_angle > cos_inner_cone_angle) {
         return 1.0f;
-    } else {
+    } else if (cos_angle < cos_outer_cone_angle) {
         return 0.0f;
+    } else {
+        return pow((cos_angle - cos_outer_cone_angle) / (cos_inner_cone_angle - cos_outer_cone_angle), 2.0f);
     }
 }
 

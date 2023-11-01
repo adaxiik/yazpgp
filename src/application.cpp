@@ -170,7 +170,7 @@ namespace yazpgp
         // Solar system scene
         scenes.push_back(DemoScenes::phong_four_balls(meshes, shaders));
         scenes.push_back(DemoScenes::solar_system(meshes, shaders, *m_window));
-        scenes.push_back(DemoScenes::ball_between_light_and_camera(meshes, shaders));
+        // scenes.push_back(DemoScenes::ball_between_light_and_camera(meshes, shaders));
         scenes.push_back(DemoScenes::squish_test(meshes, shaders, textures));
         scenes.emplace_back(std::move(DemoScenes::forest(meshes, shaders, textures).set_skybox(skybox)));
         

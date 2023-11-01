@@ -21,6 +21,7 @@ namespace yazpgp
     , m_point_light_event_distributor(std::make_unique<EventDistributor<PointLight>>())
     , m_spot_light_event_distributor(std::make_unique<EventDistributor<SpotLight>>())
     , m_directional_light_event_distributor(std::make_unique<EventDistributor<DirectionalLight>>())
+    , m_light_count_event_distributor(std::make_unique<EventDistributor<LightCountData>>())
     {
         m_camera.set_notify_callback([event_distributor = m_camera_event_distributor.get()](const Camera& camera)
         {
@@ -90,6 +91,13 @@ namespace yazpgp
                     LightUseVisitor{ *shader, i }(light);
                 
                 shader->set_uniform("light.num_directional_lights", static_cast<int>(lights->size()));
+            });
+
+            m_light_count_event_distributor->subscribe([shader = entity.shader.get()](const LightCountData& light_count_data)
+            {
+                shader->set_uniform("light.num_point_lights", static_cast<int>(light_count_data.point_light_count));
+                shader->set_uniform("light.num_spot_lights", static_cast<int>(light_count_data.spot_light_count));
+                shader->set_uniform("light.num_directional_lights", static_cast<int>(light_count_data.directional_light_count));
             });
 
             entity.shader->set_uniform("light.num_point_lights", static_cast<int>(m_point_lights->size()));
@@ -194,6 +202,14 @@ namespace yazpgp
         
         for (const auto& light : *m_directional_lights)
             m_directional_light_event_distributor->notify(light);
+
+        m_light_count_event_distributor->notify(
+            LightCountData{ 
+                m_point_lights->size(),
+                m_spot_lights->size(),
+                m_directional_lights->size()
+            }
+        );
             
         return *this;
     }

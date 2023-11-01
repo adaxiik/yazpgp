@@ -71,6 +71,15 @@ namespace yazpgp
         std::unique_ptr<EventDistributor<DirectionalLight>> m_directional_light_event_distributor;
         std::shared_ptr<Skybox> m_skybox;
 
+        struct LightCountData
+        {
+            size_t point_light_count = 0;
+            size_t spot_light_count = 0;
+            size_t directional_light_count = 0;
+        };
+
+        std::unique_ptr<EventDistributor<LightCountData>> m_light_count_event_distributor;
+
     };
 
     constexpr enum Scene::AddEntityOptions operator|(Scene::AddEntityOptions lhs, Scene::AddEntityOptions rhs)

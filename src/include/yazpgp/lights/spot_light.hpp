@@ -73,6 +73,10 @@ namespace yazpgp
             return *this;
         }
 
-        
+        SpotLight& invoke()
+        {
+            notify(*this);
+            return *this;
+        }
     };
 }

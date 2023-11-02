@@ -236,9 +236,10 @@ namespace yazpgp::DemoScenes
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
         .add_light(
             // PointLight().set_position({0.f, 50.f, 50.f}).set_illumination_radius(1000.f)
-            DirectionalLight().set_direction({0.f, -1.f, 0.f})
-            // SpotLight().set_position({0.f, 5.f, 0.f}).set_direction({0.f, -1.f, 0.f}).set_illumination_radius(100.f)
+            // DirectionalLight().set_direction({0.f, -1.f, 0.f})
+            SpotLight()
         )
+        .lock_spotlights_to_camera()
         .camera().move_up(5.f);
         
         std::mt19937 gen(69);

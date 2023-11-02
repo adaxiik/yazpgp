@@ -41,7 +41,6 @@ namespace yazpgp
         for (const auto& entity : m_entities)
             entity->render(view_projection_matrix);
         
-        
     }
 
     void Scene::update(const InputManager& input_manager, double delta_time)
@@ -211,6 +210,20 @@ namespace yazpgp
             }
         );
             
+        return *this;
+    }
+
+    Scene& Scene::lock_spotlights_to_camera()
+    {
+        m_camera_event_distributor->subscribe([spot_lights = m_spot_lights.get()](const Camera& c)
+        {
+            for (auto& light : *spot_lights)
+            {
+                light.set_position(c.position());
+                light.set_direction(c.target());
+                light.invoke();
+            }
+        });
         return *this;
     }
 }

@@ -49,6 +49,7 @@ namespace yazpgp
         Scene& add_light(const SpotLight& light);
         Scene& add_light(const DirectionalLight& light);
         Scene& set_skybox(std::shared_ptr<Skybox> skybox);
+        Scene& lock_spotlights_to_camera();
 
         auto begin() { return m_entities.begin(); }
         auto end() { return m_entities.end(); }

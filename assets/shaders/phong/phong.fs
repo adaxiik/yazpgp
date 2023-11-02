@@ -163,15 +163,17 @@ vec3 spot_light(SpotLight light, vec3 normal, vec3 light_direction, vec3 view_di
     return attenuation * cone * (ambient_light + diffuse_light + specular_light);
 }
 
-vec3 all_lights(vec3 normal, vec3 light_direction, vec3 view_direction, vec3 world_position){
+vec3 all_lights(vec3 normal, vec3 view_direction, vec3 world_position){
     vec3 light_color = vec3(0.0f);
     for (int i = 0; i < light.num_point_lights; i++) {
+        vec3 light_direction = normalize(light.point_lights[i].position - world_position);
         light_color += point_light(light.point_lights[i], normal, light_direction, view_direction, world_position);
     }
     for (int i = 0; i < light.num_directional_lights; i++) {
         light_color += directional_light(light.directional_lights[i], normal, view_direction);
     }
     for (int i = 0; i < light.num_spot_lights; i++) {
+        vec3 light_direction = normalize(light.spot_lights[i].position - world_position);
         light_color += spot_light(light.spot_lights[i], normal, light_direction, view_direction, world_position);
     }
 
@@ -188,9 +190,8 @@ uniform mat3 normal_matrix;
 
 void main () {
     vec3 normal = normalize(normal_matrix * vs_normal);
-    vec3 light_direction = normalize(light.point_lights[0].position - world_position);
     vec3 view_direction = normalize(camera_position - world_position);
-    vec3 light_color = all_lights(normal, light_direction, view_direction, world_position);
+    vec3 light_color = all_lights(normal, view_direction, world_position);
 
     frag_color = vec4(light_color, 1);
 }

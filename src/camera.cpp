@@ -125,16 +125,18 @@ namespace yazpgp
         if (input.get_key(Key::Q))
             move_up(-m_speed * delta_time);
     
-        m_speed = original_speed;
-
-        if (m_update)
-            notify(*this);
+        m_speed = original_speed;  
 
         if (not input.relative_mouse_mode())
-            return;
+            goto skip_rotation;
 
         rotate_up(input.mouse_delta_y() * m_sensitivity);
         rotate_right(input.mouse_delta_x() * m_sensitivity);   
+
+
+        skip_rotation:
+        if (m_update)
+            notify(*this);
     }
 
     const glm::vec3& Camera::position() const

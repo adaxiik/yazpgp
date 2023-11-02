@@ -151,16 +151,25 @@ namespace yazpgp
         // if (not cubemap_factory)
         //     return 1;
 
-        auto cubemap_forest = io::load_cubemap_from_files({
-            "assets/textures/skybox_forest/face0.png",
-            "assets/textures/skybox_forest/face1.png",
-            "assets/textures/skybox_forest/face2.png",
-            "assets/textures/skybox_forest/face3.png",
-            "assets/textures/skybox_forest/face4.png",
-            "assets/textures/skybox_forest/face5.png",
+        // auto cubemap_forest = io::load_cubemap_from_files({
+        //     "assets/textures/skybox_forest/face0.png",
+        //     "assets/textures/skybox_forest/face1.png",
+        //     "assets/textures/skybox_forest/face2.png",
+        //     "assets/textures/skybox_forest/face3.png",
+        //     "assets/textures/skybox_forest/face4.png",
+        //     "assets/textures/skybox_forest/face5.png",
+        // });
+
+        auto cubemap_nightsky = io::load_cubemap_from_files({
+            "assets/textures/skybox_nightsky/face0.png",
+            "assets/textures/skybox_nightsky/face1.png",
+            "assets/textures/skybox_nightsky/face2.png",
+            "assets/textures/skybox_nightsky/face3.png",
+            "assets/textures/skybox_nightsky/face4.png",
+            "assets/textures/skybox_nightsky/face5.png",
         });
 
-        auto skybox = std::make_shared<Skybox>(cubemap_forest, shaders["skybox"]);
+        auto skybox = std::make_shared<Skybox>(cubemap_nightsky, shaders["skybox"]);
 
     
 

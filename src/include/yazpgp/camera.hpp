@@ -20,7 +20,6 @@ namespace yazpgp
         float m_speed;
         float m_sensitivity;
 
-        glm::vec3 target() const;
         glm::mat4 compute_view_matrix() const;
        
         mutable bool m_update;
@@ -36,6 +35,7 @@ namespace yazpgp
         );
         
         const glm::mat4& view_matrix() const;
+        glm::vec3 target() const;
         void update(const InputManager& input, float delta_time);
 
         void rotate_up(float angle_deg);

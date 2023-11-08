@@ -13,7 +13,7 @@ namespace yazpgp
         float diffuse_intensity = 1.0f;
         float specular_intensity = 1.0f;
 
-        DirectionalLight() = default;
+        // DirectionalLight() = default;
 
         DirectionalLight& set_direction(const glm::vec3& direction)
         {

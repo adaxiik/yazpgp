@@ -36,7 +36,8 @@ namespace yazpgp::DemoScenes
                 .material = PhongBlinnMaterial::default_material(),
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
         .add_light(
-            PointLight()
+            // PointLight()
+            DirectionalLight{.direction = {0.f, -1.f, 0.f}}
         );
 
         return s;
@@ -212,6 +213,7 @@ namespace yazpgp::DemoScenes
     {
         Scene s;
         const auto phong_textured_shader = shaders["phong_textured"];
+        const auto phong_shader = shaders["phong"];
         const auto blinn_shader = shaders["blinn"];
         const auto rtx_shader = shaders["rtx"];
         const auto plane_mesh = meshes["plane"];
@@ -298,12 +300,22 @@ namespace yazpgp::DemoScenes
             .transform = Transform::default_transform().translate({0.f, 0.f, 3.f}),
             .material = PhongBlinnMaterial::default_material(),
             .transform_modifier = [&](const glm::mat4& m) {
-                static float angle = 0.f;
-                angle += 0.5f;
+                // static float angle = 0.f;
+                // angle += 0.5f;
+                // return Transform::Mat4Compositor::Composite({
+                //     Transform::Mat4Compositor::Rotate({0, angle, 0}),
+                //     m
+                // })();
+                static float t = 0.f;
+                t += 0.1f;
+
+                float height = std::sin(t) + 1.f;
+
                 return Transform::Mat4Compositor::Composite({
-                    Transform::Mat4Compositor::Rotate({0, angle, 0}),
+                    Transform::Mat4Compositor::Translate({0, height, 0}),
                     m
                 })();
+
             }
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
 
@@ -319,7 +331,7 @@ namespace yazpgp::DemoScenes
             if (i % 2)
             {
                 s.add_entity(Scene::SceneRenderableEntity{
-                    .shader = blinn_shader,
+                    .shader = phong_shader,
                     .mesh = ball_mesh,
                     .textures = {tree_texture},
                     .transform = Transform::default_transform().translate({pos_x, 2.f, pos_z}).scale({0.3f, 0.3f, 0.3f}),

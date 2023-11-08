@@ -14,8 +14,8 @@ namespace yazpgp
         float diffuse_intensity = 1.0f;
         float specular_intensity = 1.0f;
         float illumination_radius = 100.0f;
-        float inner_cone_angle_degrees = 20.0f;
-        float outer_cone_angle_degrees = 35.0f;
+        float inner_cone_angle_degrees = 10.0f;
+        float outer_cone_angle_degrees = 25.0f;
 
         SpotLight() = default;
 

@@ -13,5 +13,6 @@ void main () {
     gl_Position = mvp_matrix * vec4(vertex_position, 1.0);
     vs_normal = vertex_normal;
     vs_texcoord = vertex_texcoord;
-    world_position = (model_matrix * vec4(vertex_position, 1.0)).xyz;
+    vec4 p = (model_matrix * vec4(vertex_position, 1.0));
+    world_position = p.xyz / p.w;
 }

@@ -36,8 +36,7 @@ namespace yazpgp::DemoScenes
                 .material = PhongBlinnMaterial::default_material(),
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
         .add_light(
-            // PointLight()
-            DirectionalLight{.direction = {0.f, -1.f, 0.f}}
+            DirectionalLight().set_direction({0.f, -1.f, 0.f})
         );
 
         return s;
@@ -353,6 +352,103 @@ namespace yazpgp::DemoScenes
             
         }
 
+
+        return s;
+    }
+
+    Scene normal_mapping(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders, const AssetStorage<Texture>& textures)
+    {
+        const auto normal_shader = shaders["phong_textured_normals"];
+        const auto phong_shader = shaders["phong_textured"];
+        // const auto tonk_mesh = meshes["tonk"];
+        // const auto tonk_texture = textures["tonk"];
+        // const auto tonk_normal_texture = textures["tonk_normal"];
+        const auto plane_mesh = meshes["plane"];
+        const auto brick_texture = textures["wall"];
+        const auto brick_normal_texture = textures["wall_normal"];
+
+        Scene s;
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = phong_shader,
+            .mesh = plane_mesh,
+            .textures = {brick_texture, brick_normal_texture},
+            .transform = Transform::default_transform().translate({0.f, 2.f, 0.f}).rotate({90.f, 0.f, 0.f}),
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_entity(Scene::SceneRenderableEntity{
+            .shader = normal_shader,
+            .mesh = plane_mesh,
+            .textures = {brick_texture, brick_normal_texture},
+            .transform = Transform::default_transform().translate({0.f, 0.f, 0.f}).rotate({90.f, 0.f, 0.f}),
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_light(
+            // DirectionalLight().set_direction({0.f, -1.f, 0.f})
+            PointLight().set_position({1.f, 1.f, 2.f}).invoke()
+        );
+        // .lock_spotlights_to_camera();
+
+        return s;
+    }
+
+    Scene shell_texturing(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders, const AssetStorage<Texture>& textures)
+    {
+        const auto plane_mesh = meshes["plane"];
+        const auto grass_shader = shaders["grass"];
+        constexpr auto plane_scale = 10.f;
+        constexpr auto shells = 64;
+        constexpr float max_grass_width = 0.25f;
+        constexpr float high_diff = max_grass_width / shells;
+
+        const auto black_shader = Shader::create_default_shader(0,0,0,1);
+        Scene s;
+
+        const auto grass_material = PhongBlinnMaterial::create_shared(
+            glm::vec3(1.f),
+            glm::vec3(1.f),
+            glm::vec3(0.f)
+        );
+
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = black_shader,
+            .mesh = plane_mesh,
+            .transform = Transform::default_transform()
+                .scale({plane_scale, 1.f, plane_scale}),
+            .material = grass_material,
+        // }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+        });
+
+        for (size_t i = 0; i < shells; i++)
+        {
+            s.add_entity(Scene::SceneRenderableEntity{
+                .shader = grass_shader,
+                .mesh = plane_mesh,
+                .transform = Transform::default_transform()
+                    .translate({0.f, i * high_diff, 0.f})
+                    .scale({plane_scale, 1.f, plane_scale}),
+                .material = grass_material,
+            // }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+            });
+        }
+
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = shaders["phong_textured"],
+            .mesh = meshes["tree"],
+            .textures = {textures["mad"]},
+            .transform = Transform::default_transform().scale({0.3f, 0.3f, 0.3f}),
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+
+
+        // s.add_light(
+        //     SpotLight()
+        // ).lock_spotlights_to_camera();
+
+        s.add_light(
+            DirectionalLight().set_direction({0.f, -1.f, 1.f})
+        );
+
+        s.camera().move_up(3.f);
 
         return s;
     }

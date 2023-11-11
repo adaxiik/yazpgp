@@ -213,16 +213,14 @@ namespace yazpgp
         return *this;
     }
 
-    Scene& Scene::lock_spotlights_to_camera()
+    Scene& Scene::lock_spotlights_to_camera(size_t index )
     {
-        m_camera_event_distributor->subscribe([spot_lights = m_spot_lights.get()](const Camera& c)
+        m_camera_event_distributor->subscribe([spot_lights = m_spot_lights.get(), index](const Camera& c)
         {
-            for (auto& light : *spot_lights)
-            {
-                light.set_position(c.position());
-                light.set_direction(c.target());
-                light.invoke();
-            }
+            auto& light = spot_lights->at(index);
+            light.set_position(c.position());
+            light.set_direction(c.target());
+            light.invoke();
         });
         return *this;
     }

@@ -39,7 +39,10 @@ namespace yazpgp
             m_material->use(*m_shader);
 
         for (size_t i = 0; i < m_textures.size(); i++)
+        {
             m_textures[i]->use(i);
+            m_shader->set_uniform("texture_" + std::to_string(i), static_cast<int>(i));
+        }
 
         m_mesh->use();
         // glDrawArrays(GL_TRIANGLES, 0, m_mesh->get_vert_count());

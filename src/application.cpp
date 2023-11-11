@@ -77,9 +77,12 @@ namespace yazpgp
 
 
         if (not textures.add("tonk", io::load_texture_from_file("assets/textures/tonk_diff.png"))) return 1;
+        if (not textures.add("tonk_normal", io::load_texture_from_file("assets/textures/tonk_normal.png"))) return 1;
         if (not textures.add("mad", io::load_texture_from_file("assets/textures/mad.png"))) return 1;
         if (not textures.add("grass", io::load_texture_from_file("assets/textures/grass.png"))) return 1;
         if (not textures.add("rat", io::load_texture_from_file("assets/textures/rat_diff.jpg"))) return 1;
+        if (not textures.add("wall", io::load_texture_from_file("assets/textures/brickwall_diff.jpg"))) return 1;
+        if (not textures.add("wall_normal", io::load_texture_from_file("assets/textures/brickwall_normal.jpg"))) return 1;
 
         if (not shaders.add("white", Shader::create_default_shader(1.f, 1.f, 1.f, 1.f))) return 1;
 
@@ -129,6 +132,16 @@ namespace yazpgp
             "assets/shaders/rtx/rtx.fs"
         ))) return 1;
 
+        if (not shaders.add("phong_textured_normals", io::load_shader_from_file(
+            "assets/shaders/phong_textured_normals/phong_textured_normals.vs",
+            "assets/shaders/phong_textured_normals/phong_textured_normals.fs"
+        ))) return 1;
+
+        if (not shaders.add("grass", io::load_shader_from_file(
+            "assets/shaders/grass/grass.vs",
+            "assets/shaders/grass/grass.fs"
+        ))) return 1;
+
         // auto cubemap_ocean = io::load_cubemap_from_files({
         //     "assets/textures/skybox_ocean/right.jpg",
         //     "assets/textures/skybox_ocean/left.jpg",
@@ -140,25 +153,25 @@ namespace yazpgp
         // if (not cubemap_ocean)
         //     return 1;
 
-        // auto cubemap_factory = io::load_cubemap_from_files({
-        //     "assets/textures/skybox_factory/face0.png",
-        //     "assets/textures/skybox_factory/face1.png",
-        //     "assets/textures/skybox_factory/face2.png",
-        //     "assets/textures/skybox_factory/face3.png",
-        //     "assets/textures/skybox_factory/face4.png",
-        //     "assets/textures/skybox_factory/face5.png",
-        // });
-        // if (not cubemap_factory)
-        //     return 1;
+        auto cubemap_factory = io::load_cubemap_from_files({
+            "assets/textures/skybox_factory/face0.png",
+            "assets/textures/skybox_factory/face1.png",
+            "assets/textures/skybox_factory/face2.png",
+            "assets/textures/skybox_factory/face3.png",
+            "assets/textures/skybox_factory/face4.png",
+            "assets/textures/skybox_factory/face5.png",
+        });
+        if (not cubemap_factory)
+            return 1;
 
-        // auto cubemap_forest = io::load_cubemap_from_files({
-        //     "assets/textures/skybox_forest/face0.png",
-        //     "assets/textures/skybox_forest/face1.png",
-        //     "assets/textures/skybox_forest/face2.png",
-        //     "assets/textures/skybox_forest/face3.png",
-        //     "assets/textures/skybox_forest/face4.png",
-        //     "assets/textures/skybox_forest/face5.png",
-        // });
+        auto cubemap_forest = io::load_cubemap_from_files({
+            "assets/textures/skybox_forest/face0.png",
+            "assets/textures/skybox_forest/face1.png",
+            "assets/textures/skybox_forest/face2.png",
+            "assets/textures/skybox_forest/face3.png",
+            "assets/textures/skybox_forest/face4.png",
+            "assets/textures/skybox_forest/face5.png",
+        });
 
         auto cubemap_nightsky = io::load_cubemap_from_files({
             "assets/textures/skybox_nightsky/face0.png",
@@ -169,8 +182,9 @@ namespace yazpgp
             "assets/textures/skybox_nightsky/face5.png",
         });
 
-        auto skybox = std::make_shared<Skybox>(cubemap_nightsky, shaders["skybox"]);
-
+        auto skybox_nightsky = std::make_shared<Skybox>(cubemap_nightsky, shaders["skybox"]);
+        auto skybox_factory = std::make_shared<Skybox>(cubemap_factory, shaders["skybox"]);
+        auto skybox_forest = std::make_shared<Skybox>(cubemap_forest, shaders["skybox"]);
     
 
         // scenes
@@ -181,103 +195,9 @@ namespace yazpgp
         scenes.push_back(DemoScenes::solar_system(meshes, shaders, *m_window));
         // scenes.push_back(DemoScenes::ball_between_light_and_camera(meshes, shaders));
         scenes.push_back(DemoScenes::squish_test(meshes, shaders, textures));
-        scenes.emplace_back(std::move(DemoScenes::forest(meshes, shaders, textures).set_skybox(skybox)));
-        
-        // scenes.push_back(std::move(
-        //     Scene()
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //         .shader = phong_textured_shader,
-        //         .mesh = tonk_mesh,
-        //         .textures = { tonk_texture },
-        //         .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
-        //         .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //         .shader = white_shader,
-        //         .mesh = grid_mesh,
-        //         .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
-        //     })
-        //     .add_light(
-        //         PointLight()
-        //     )
-        // ));
-
-        // scenes.push_back(std::move(
-        //     Scene()
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //         .shader = phong_textured_shader,
-        //         .mesh = mad_mesh,
-        //         .textures = { mad_texture },
-        //         .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //         .shader = white_shader,
-        //         .mesh = grid_mesh,
-        //         .transform = Transform::default_transform().translate({0.f, -10.f, 0.f}).scale({5.f, 5.f, 5.f})
-        //     })
-        //     .add_light(
-        //         PointLight().set_position({0.f, 5.f, 3.f})
-        //     )
-        // ));
-
-
-        // scenes.push_back(std::move(
-        //     Scene()
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //             .shader = phong_shader,
-        //             .mesh = ball_mesh,
-        //             .transform = Transform::default_transform().translate({0.0f, 0.0f, 3.0f}),
-        //             .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //             .shader = lambert_shader,
-        //             .mesh = ball_mesh,
-        //             .transform = Transform::default_transform().translate({0.0f, 0.0f, -3.0f}),
-        //             .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //             .shader = ambient_shader,
-        //             .mesh = ball_mesh,
-        //             .transform = Transform::default_transform().translate({0.0f, 3.0f, 0.0f}),
-        //             .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //             .shader = blinn_shader,
-        //             .mesh = ball_mesh,
-        //             .transform = Transform::default_transform().translate({0.0f, -3.0f, 0.0f}),
-        //             .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
-        //     .add_light(
-        //         PointLight()
-        //     )
-        // ));
-
-        // scenes.push_back(std::move(
-        //     Scene()
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //         .shader = phong_textured_shader,
-        //         .mesh = tonk_mesh,
-        //         .textures = { tonk_texture },
-        //         .transform = Transform::default_transform().rotate({-90.f, 0.f, 0.f}).translate({10.f, 0.f, 0.f}),
-        //         .material = PhongBlinnMaterial::default_material(),
-        //     }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader )
-        //     .add_light(
-        //         PointLight().set_position({0.f, 3.f, 3.f})
-        //     )
-        //     .set_skybox(skybox)
-        // ));
-
-        // scenes.push_back(std::move(
-        //     Scene()
-        //     .add_entity(Scene::SceneRenderableEntity{
-        //         .shader = rtx_shader,
-        //         .mesh = ball_mesh,
-        //         .textures = { cubemap_factory },
-        //         .transform = Transform::default_transform(),
-        //         // .material = PhongBlinnMaterial::default_material(),
-        //     })
-        //     .set_skybox(skybox)
-        // ));
+        scenes.emplace_back(std::move(DemoScenes::forest(meshes, shaders, textures).set_skybox(skybox_nightsky)));
+        scenes.emplace_back(std::move(DemoScenes::normal_mapping(meshes, shaders, textures).set_skybox(skybox_factory)));
+        scenes.emplace_back(std::move(DemoScenes::shell_texturing(meshes, shaders, textures).set_skybox(skybox_forest)));
 
         float fov = 60.0f;
         glm::mat4 projection_matrix = glm::perspective(fov, (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);

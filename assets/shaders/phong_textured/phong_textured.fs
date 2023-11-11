@@ -97,12 +97,12 @@ vec3 directional_light_ambient(DirectionalLight light){
 }
 
 vec3 directional_light_diffuse(DirectionalLight light, vec3 normal){
-    float diffuse_factor = max(dot(normal, -light.direction), 0.0f);
+    float diffuse_factor = max(dot(normal, -normalize(light.direction)), 0.0f);
     return diffuse_factor * light.intensity.diffuse * light.color * material.diffuse_color;
 }
 
 vec3 directional_light_specular(DirectionalLight light, vec3 normal, vec3 view_direction){
-    vec3 reflect_direction = reflect(light.direction, normal);
+    vec3 reflect_direction = reflect(normalize(light.direction), normal);
     float specular_factor = pow(max(dot(view_direction, reflect_direction), 0.0f), material.specular_shininess);
     // if (diffuse_factor == 0.0f) {
         // specular_factor = 0.0f;

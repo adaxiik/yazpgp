@@ -51,6 +51,12 @@ namespace yazpgp
             this->illumination_radius = illumination_radius;
             return *this;
         }
+
+        PointLight& invoke()
+        {
+            notify(*this);
+            return *this;
+        }
         
     };
 }

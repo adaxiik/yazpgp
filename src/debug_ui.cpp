@@ -17,7 +17,7 @@ namespace yazpgp
             ImGui::SetWindowCollapsed(true, ImGuiCond_Once); 
 
             camera_component(scene.m_camera);   
-            // lights_component(*scene.m_lights);
+            lights_component(*scene.m_point_lights);
             entities_component(scene.m_entities);
         }   
         ImGui::End();

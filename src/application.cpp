@@ -261,10 +261,25 @@ namespace yazpgp
             scene.render(projection_matrix);
             DebugUI::scene_window(scene);
 
-            ImGui::Begin("Info");
-            ImGui::Text("FPS: %.2f", 1.f / m_window->delta_time());
-            ImGui::Text("Imgui FPS: %.2f", ImGui::GetIO().Framerate);
-            ImGui::End();
+            // ImGui::Begin("Info");
+            // ImGui::Text("FPS: %.2f", 1.f / m_window->delta_time());
+            // ImGui::Text("Imgui FPS: %.2f", ImGui::GetIO().Framerate);
+            // ImGui::End();
+            auto& input_manager = this->m_window->input_manager();
+
+            uint32_t entity_id_under_mouse = m_window->get_stencil_value(input_manager.mouse_x(), input_manager.mouse_y());
+            std::cout << entity_id_under_mouse << std::endl;
+            if (entity_id_under_mouse > 0 and not m_window->mouse_is_relative())
+            {
+                auto& entity = scene.entities()[entity_id_under_mouse - 1];
+                ImGui::Begin("Entity Info", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse);
+                ImGui::SetWindowPos({static_cast<float>(input_manager.mouse_x()), static_cast<float>(input_manager.mouse_y())});
+                ImGui::Text("Entity ID: %d", entity_id_under_mouse - 1);
+                ImGui::Text("Entity Position: (%f, %f, %f)", entity->transform().position_data.x, entity->transform().position_data.y, entity->transform().position_data.z);
+                ImGui::Text("Entity Rotation: (%f, %f, %f)", entity->transform().rotation_data.x, entity->transform().rotation_data.y, entity->transform().rotation_data.z);
+                ImGui::Text("Entity Scale: (%f, %f, %f)", entity->transform().scale_data.x, entity->transform().scale_data.y, entity->transform().scale_data.z);
+                ImGui::End();
+            }
 
 
             this->frame();

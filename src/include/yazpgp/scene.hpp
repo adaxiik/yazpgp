@@ -60,6 +60,7 @@ namespace yazpgp
         Scene& invoke_distributors();
 
         Camera& camera();
+        std::vector<std::unique_ptr<RenderableEntity>>& entities();
     private:
         Camera m_camera;
         std::vector<std::unique_ptr<RenderableEntity>> m_entities;

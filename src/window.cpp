@@ -22,6 +22,7 @@ namespace yazpgp
 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
         auto window = SDL_WindowPtr( 
             SDL_CreateWindow(config.title.c_str(),
@@ -67,6 +68,9 @@ namespace yazpgp
         glFrontFace(GL_CCW);  
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+        glEnable(GL_STENCIL_TEST);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilMask(0xFF);
 
         YAZPGP_LOG_INFO("Glew initialized");
 
@@ -151,7 +155,7 @@ namespace yazpgp
     void Window::clear(glm::vec3 color)
     {
         glClearColor(color.r, color.g, color.b, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     bool Window::is_running() const
@@ -174,6 +178,11 @@ namespace yazpgp
         SDL_SetRelativeMouseMode(enabled ? SDL_TRUE : SDL_FALSE);
     }
 
+    bool Window::mouse_is_relative() const
+    {
+        return SDL_GetRelativeMouseMode() == SDL_TRUE;
+    }
+
     double Window::delta_time() const
     {
         return m_delta_time;
@@ -192,5 +201,12 @@ namespace yazpgp
     int Window::height() const
     {
         return m_height;
+    }
+
+    uint32_t Window::get_stencil_value(int x, int y) const
+    {
+        uint32_t stencil_value = 0;
+        glReadPixels(x, m_height - y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &stencil_value);
+        return stencil_value;
     }
 }

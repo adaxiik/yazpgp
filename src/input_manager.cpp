@@ -114,6 +114,12 @@ namespace yazpgp
                     m_mouse_y = event.motion.y;
                     m_mouse_delta_x = event.motion.xrel;
                     m_mouse_delta_y = event.motion.yrel;
+                    dispatch(MouseMoveEvent{
+                        .x = m_mouse_x,
+                        .y = m_mouse_y,
+                        .delta_x = m_mouse_delta_x,
+                        .delta_y = m_mouse_delta_y
+                    });
                     break;
                 }
                 default:

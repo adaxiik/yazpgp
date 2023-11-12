@@ -35,13 +35,22 @@ namespace yazpgp
     {
         auto view_projection_matrix = projection_matrix * m_camera.view_matrix();
 
+        glStencilMask(0x00);
         if (m_skybox)
             m_skybox->render(projection_matrix, m_camera.view_matrix());
 
-        for (const auto& entity : m_entities)
+
+        // for (const auto& entity : m_entities)
+        //     entity->render(view_projection_matrix);
+
+        glStencilMask(0xFF);
+        for (size_t i = 0; i < m_entities.size(); i++)
+        {
+            auto& entity = m_entities[i];
+            glStencilFunc(GL_ALWAYS, i + 1, 0xFF);
             entity->render(view_projection_matrix);
-        
-    }
+        }
+    }    
 
     void Scene::update(const InputManager& input_manager, double delta_time)
     {
@@ -223,5 +232,10 @@ namespace yazpgp
             light.invoke();
         });
         return *this;
+    }
+
+    std::vector<std::unique_ptr<RenderableEntity>>& Scene::entities()
+    {
+        return m_entities;
     }
 }

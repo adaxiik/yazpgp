@@ -32,10 +32,12 @@ namespace yazpgp
         void pool_events();
         InputManager& input_manager();
         void set_relative_mouse_mode(bool enabled) const;
+        bool mouse_is_relative() const;
         double delta_time() const;
         double time() const;
         int width() const;
         int height() const;
+        uint32_t get_stencil_value(int x, int y) const;
 
     private:
         WindowConfig m_config;

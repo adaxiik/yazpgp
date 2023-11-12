@@ -37,6 +37,7 @@ namespace yazpgp
         KeyDown,
         KeyUp,
         Input,
+        MouseMove,
         
         COUNT
     };
@@ -98,6 +99,16 @@ namespace yazpgp
         Key key;
         using Callback = std::function<void(const WhileKeyIsDownEvent&)>;
     };
+
+    struct MouseMoveEvent
+    {
+        int x;
+        int y;
+        int delta_x;
+        int delta_y;
+        using Callback = std::function<void(const MouseMoveEvent&)>;
+        TYPE(MouseMove);
+    };
     
 
     using Event = std::variant<WindowResizeEvent,
@@ -105,7 +116,8 @@ namespace yazpgp
         QuitEvent,
         KeyDownEvent,
         KeyUpEvent,
-        InputEvent>;
+        InputEvent,
+        MouseMoveEvent>;
 
     
     template <typename EventVariant>

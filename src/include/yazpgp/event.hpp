@@ -160,7 +160,7 @@ namespace yazpgp
         template<typename T>
         void operator()(const T& callback) const
         {
-            using EventRef = typename function_traits<T>::arg<0>::type;
+            using EventRef = typename function_traits<T>::template arg<0>::type;
             using Event = typename std::remove_reference<EventRef>::type;
             callbacks[Event::type].push_back(callback);
         }

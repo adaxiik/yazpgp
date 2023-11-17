@@ -30,6 +30,25 @@ target_compile_features(yazpgp-lib PUBLIC cxx_std_20)
 add_executable(yazpgp src/main.cpp)
 target_include_directories(yazpgp PUBLIC ${YAZPGP_INCLUDE_DIRS_PREFIXED} ${YAZPGP_INCLUDE_DIRS})
 target_link_libraries(yazpgp yazpgp-lib imgui)
-target_link_libraries(yazpgp SDL2 GL X11 GLEW assimp dl SDL2_image)
+
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(assimp REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(glm REQUIRED)
+
+INCLUDE(FindPkgConfig)
+PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+
+target_link_libraries(yazpgp
+    ${SDL2_LIBRARIES}
+    ${SDL2IMAGE_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${ASSIMP_LIBRARIES}
+    ${GLM_LIBRARIES}
+)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

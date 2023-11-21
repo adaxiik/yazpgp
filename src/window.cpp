@@ -209,4 +209,11 @@ namespace yazpgp
         glReadPixels(x, m_height - y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &stencil_value);
         return stencil_value;
     }
+
+    float Window::get_depth_value(int x, int y) const
+    {
+        float depth_value = 0;
+        glReadPixels(x, m_height - y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth_value);
+        return depth_value;
+    }
 }

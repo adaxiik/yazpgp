@@ -452,4 +452,28 @@ namespace yazpgp::DemoScenes
 
         return s;
     }
+
+
+    Scene terrain(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders, const AssetStorage<Texture>& textures)
+    {
+        const auto plane_mesh = meshes["terrain"];
+        const auto grass_shader = shaders["phong_textured"];
+
+        Scene s;
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = grass_shader,
+            .mesh = plane_mesh,
+            .textures = {textures["grass"]},
+            .transform = Transform::default_transform(),
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+
+        s.add_light(
+            DirectionalLight().set_direction({0.f, -1.f, 1.f})
+        );
+
+        s.camera().move_up(3.f);
+
+        return s;
+    }
 }

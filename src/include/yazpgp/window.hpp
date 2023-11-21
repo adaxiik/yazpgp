@@ -38,6 +38,7 @@ namespace yazpgp
         int width() const;
         int height() const;
         uint32_t get_stencil_value(int x, int y) const;
+        float get_depth_value(int x, int y) const;
 
     private:
         WindowConfig m_config;

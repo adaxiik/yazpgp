@@ -74,6 +74,7 @@ namespace yazpgp
         if (not meshes.add("bush", io::load_mesh_from_file("assets/models/bush.obj"))) return 1;
         if (not meshes.add("suzi", io::load_mesh_from_file("assets/models/suzi.obj"))) return 1;
         if (not meshes.add("rat", io::load_mesh_from_file("assets/models/rat.obj"))) return 1;
+        if (not meshes.add("terrain", io::load_mesh_from_file("assets/models/terrain.obj"))) return 1;
 
 
         if (not textures.add("tonk", io::load_texture_from_file("assets/textures/tonk_diff.png"))) return 1;
@@ -83,6 +84,7 @@ namespace yazpgp
         if (not textures.add("rat", io::load_texture_from_file("assets/textures/rat_diff.jpg"))) return 1;
         if (not textures.add("wall", io::load_texture_from_file("assets/textures/brickwall_diff.jpg"))) return 1;
         if (not textures.add("wall_normal", io::load_texture_from_file("assets/textures/brickwall_normal.jpg"))) return 1;
+
 
         if (not shaders.add("white", Shader::create_default_shader(1.f, 1.f, 1.f, 1.f))) return 1;
 
@@ -198,6 +200,8 @@ namespace yazpgp
         scenes.emplace_back(std::move(DemoScenes::forest(meshes, shaders, textures).set_skybox(skybox_nightsky)));
         scenes.emplace_back(std::move(DemoScenes::normal_mapping(meshes, shaders, textures).set_skybox(skybox_factory)));
         scenes.emplace_back(std::move(DemoScenes::shell_texturing(meshes, shaders, textures).set_skybox(skybox_forest)));
+        scenes.emplace_back(std::move(DemoScenes::terrain(meshes, shaders, textures).set_skybox(skybox_forest)));
+
 
         float fov = 60.0f;
         glm::mat4 projection_matrix = glm::perspective(fov, (float)m_config.width / (float)m_config.height, 0.1f, 100.0f);
@@ -208,7 +212,7 @@ namespace yazpgp
                     glm::radians(fov), 
                     (float)event.width / (float)event.height, 
                     0.1f, 
-                    100.0f
+                    300.0f
                 );
             }}
         );
@@ -220,7 +224,7 @@ namespace yazpgp
                     glm::radians(fov),
                     m_window->width() / (float)m_window->height(),
                     0.1f, 
-                    100.0f
+                    300.0f
                 );
             }}
         );
@@ -235,6 +239,13 @@ namespace yazpgp
                 }
             }}
         );
+
+        // m_window->input_manager().add_listener(
+        //     MouseMoveEvent::Callback{[&](MouseMoveEvent event) {
+                
+                
+        //     }}
+        // );
 
         int current_scene = 0;
         m_window->input_manager().add_listener(
@@ -268,7 +279,6 @@ namespace yazpgp
             auto& input_manager = this->m_window->input_manager();
 
             uint32_t entity_id_under_mouse = m_window->get_stencil_value(input_manager.mouse_x(), input_manager.mouse_y());
-            std::cout << entity_id_under_mouse << std::endl;
             if (entity_id_under_mouse > 0 and not m_window->mouse_is_relative())
             {
                 auto& entity = scene.entities()[entity_id_under_mouse - 1];
@@ -281,6 +291,25 @@ namespace yazpgp
                 ImGui::End();
             }
 
+
+            if (input_manager.get_key_down(Key::P))
+            {
+                int x = input_manager.mouse_x();
+                int y = m_window->height() - input_manager.mouse_y();
+                float depth_at = m_window->get_depth_value(x, input_manager.mouse_y());
+                glm::vec3 screen_x = glm::vec3(x, y, depth_at);
+
+                glm::vec4 viewport = glm::vec4(0, 0, m_window->width(), m_window->height());
+                auto unprojected = glm::unProject(screen_x, scene.camera().view_matrix(), projection_matrix, viewport);
+
+                scene.add_entity(Scene::SceneRenderableEntity{
+                    .shader = shaders["phong_textured"],
+                    .mesh = meshes["tree"],
+                    .textures = {textures["mad"]},
+                    .transform = Transform::default_transform().translate(unprojected),
+                    .material = PhongBlinnMaterial::default_material(),
+                }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+            }
 
             this->frame();
         }

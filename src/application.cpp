@@ -75,6 +75,7 @@ namespace yazpgp
         if (not meshes.add("suzi", io::load_mesh_from_file("assets/models/suzi.obj"))) return 1;
         if (not meshes.add("rat", io::load_mesh_from_file("assets/models/rat.obj"))) return 1;
         if (not meshes.add("terrain", io::load_mesh_from_file("assets/models/terrain.obj"))) return 1;
+        if (not meshes.add("backpack", io::load_mesh_from_file("assets/models/backpack.obj"))) return 1;
 
 
         if (not textures.add("tonk", io::load_texture_from_file("assets/textures/tonk_diff.png"))) return 1;
@@ -84,6 +85,9 @@ namespace yazpgp
         if (not textures.add("rat", io::load_texture_from_file("assets/textures/rat_diff.jpg"))) return 1;
         if (not textures.add("wall", io::load_texture_from_file("assets/textures/brickwall_diff.jpg"))) return 1;
         if (not textures.add("wall_normal", io::load_texture_from_file("assets/textures/brickwall_normal.jpg"))) return 1;
+        if (not textures.add("rat_normal", io::load_texture_from_file("assets/textures/rat_normal.png"))) return 1;
+        if (not textures.add("backpack", io::load_texture_from_file("assets/textures/backpack_diff.jpg"))) return 1;
+        if (not textures.add("backpack_normal", io::load_texture_from_file("assets/textures/backpack_normal.png"))) return 1;
 
 
         if (not shaders.add("white", Shader::create_default_shader(1.f, 1.f, 1.f, 1.f))) return 1;
@@ -201,6 +205,7 @@ namespace yazpgp
         scenes.emplace_back(std::move(DemoScenes::normal_mapping(meshes, shaders, textures).set_skybox(skybox_factory)));
         scenes.emplace_back(std::move(DemoScenes::shell_texturing(meshes, shaders, textures).set_skybox(skybox_forest)));
         scenes.emplace_back(std::move(DemoScenes::terrain(meshes, shaders, textures).set_skybox(skybox_forest)));
+        scenes.push_back(DemoScenes::bezier_curve(meshes, shaders));
 
 
         float fov = 60.0f;

@@ -15,7 +15,14 @@ namespace yazpgp
         std::shared_ptr<Mesh> load_mesh_from_file(const std::string& path)
         {
             Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices);
+            const aiScene* scene = importer.ReadFile(
+                path,
+                aiProcess_Triangulate 
+                    | aiProcess_GenNormals 
+                    | aiProcess_JoinIdenticalVertices
+                    | aiProcess_CalcTangentSpace
+            );
+
             if (not scene)
             {
                 YAZPGP_LOG_ERROR("Failed to load mesh from file: %s", path.c_str());
@@ -51,7 +58,10 @@ namespace yazpgp
                         .ny = mesh->mNormals[j].y,
                         .nz = mesh->mNormals[j].z,
                         .u = has_uvs ? mesh->mTextureCoords[0][j].x : 0.0f,
-                        .v = has_uvs ? mesh->mTextureCoords[0][j].y : 0.0f
+                        .v = has_uvs ? mesh->mTextureCoords[0][j].y : 0.0f,
+                        .tx = mesh->mTangents[j].x,
+                        .ty = mesh->mTangents[j].y,
+                        .tz = mesh->mTangents[j].z
                     });
                 }
             }
@@ -76,7 +86,8 @@ namespace yazpgp
             return std::make_shared<Mesh>(vertex_data, indices, VertexAttributeLayout({
                 {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
                 {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
-                {.size = 2, .type = GL_FLOAT, .normalized = GL_FALSE}
+                {.size = 2, .type = GL_FLOAT, .normalized = GL_FALSE},
+                {.size = 3, .type = GL_FLOAT, .normalized = GL_FALSE},
             }));
         }
     

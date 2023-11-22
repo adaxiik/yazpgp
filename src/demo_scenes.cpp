@@ -1,5 +1,6 @@
 #include "demo_scenes.hpp"
 #include "phong_blinn_material.hpp"
+#include "bezier_curve.hpp"
 
 #include <random>
 
@@ -248,7 +249,7 @@ namespace yazpgp::DemoScenes
         std::uniform_real_distribution<> scale_dis(0.5, 1.5);
         std::uniform_real_distribution<> rot_dis(0.0, 360.0);
 
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 20; i++)
         {
             float scale = scale_dis(gen);
             s.add_entity(Scene::SceneRenderableEntity{
@@ -360,12 +361,16 @@ namespace yazpgp::DemoScenes
     {
         const auto normal_shader = shaders["phong_textured_normals"];
         const auto phong_shader = shaders["phong_textured"];
-        // const auto tonk_mesh = meshes["tonk"];
-        // const auto tonk_texture = textures["tonk"];
-        // const auto tonk_normal_texture = textures["tonk_normal"];
         const auto plane_mesh = meshes["plane"];
         const auto brick_texture = textures["wall"];
         const auto brick_normal_texture = textures["wall_normal"];
+        const auto backpack_mesh = meshes["backpack"];
+        const auto backpack_texture = textures["backpack"];
+        const auto backpack_normal_texture = textures["backpack_normal"];
+        const auto rat_mesh = meshes["rat"];
+        const auto rat_texture = textures["rat"];
+        const auto rat_normal_texture = textures["rat_normal"];
+
 
         Scene s;
         s.add_entity(Scene::SceneRenderableEntity{
@@ -384,9 +389,18 @@ namespace yazpgp::DemoScenes
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
         .add_light(
             // DirectionalLight().set_direction({0.f, -1.f, 0.f})
-            PointLight().set_position({1.f, 1.f, 2.f}).invoke()
+            PointLight().set_position({3.f, 3.f, 2.f}).invoke()
+        )
+        .add_entity(
+            Scene::SceneRenderableEntity{
+                .shader = normal_shader,
+                .mesh = backpack_mesh,
+                .textures = {backpack_texture, backpack_normal_texture},
+                .transform = Transform::default_transform(),
+                .material = PhongBlinnMaterial::default_material(),
+            }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader
         );
-        // .lock_spotlights_to_camera();
+        
 
         return s;
     }
@@ -473,6 +487,78 @@ namespace yazpgp::DemoScenes
         );
 
         s.camera().move_up(3.f);
+
+        return s;
+    }
+
+    Scene bezier_curve(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders)
+    {
+        const auto ball_mesh = meshes["ball"];
+        const auto phong_shader = shaders["phong"];
+        const auto grid_mesh = meshes["grid"];
+        const auto white_shader = shaders["white"];
+
+
+        // BezierCurve<4> curve({{
+        //     {0.f, 0.f, 0.f},
+        //     {0.f, 5.f, 0.f},
+        //     {5.f, 5.f, 0.f},
+        //     {5.f, 0.f, 0.f},
+        // }});
+
+        BezierCurve<10> curve({{
+            {0.f, 0.f, 0.f},
+            {0.f, 5.f, 0.f},
+            {0.f, 5.f, 5.f},
+            {0.f, 0.f, 5.f},
+            {5.f, 0.f, 5.f},
+            {5.f, 5.f, 5.f},
+            {5.f, 5.f, 0.f},
+            {5.f, 0.f, 0.f},
+            {0.f, 0.f, 0.f},
+            {0.f, 5.f, 0.f},
+        }});
+
+        Scene s;
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = phong_shader,
+            .mesh = ball_mesh,
+            .transform = Transform::default_transform(),
+            .material = PhongBlinnMaterial::default_material(),
+            .transform_modifier = [=](const glm::mat4& m) {
+                static float dt = 0.f;
+                dt += 0.01f;
+
+                float t = std::sin(dt) * 0.5f + 0.5f;
+
+                glm::vec3 position = curve(t);
+
+                return Transform::Mat4Compositor::Composite({
+                    Transform::Mat4Compositor::Translate(position),
+                })(m);
+            },
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_entity(Scene::SceneRenderableEntity{
+            .shader = white_shader,
+            .mesh = grid_mesh,
+            .transform = Transform::default_transform(),
+        })
+        .add_light(
+            PointLight().set_position({0.f, 5.f, 5.f})
+        )
+        .camera().move_up(5.f);
+
+        constexpr float balls = 100;
+        constexpr float step = 1.f / balls;
+        for (float t = 0.f; t < 1.f; t += step)
+        {
+            glm::vec3 position = curve(t);
+            s.add_entity(Scene::SceneRenderableEntity{
+                .shader = white_shader,
+                .mesh = ball_mesh,
+                .transform = Transform::default_transform().translate(position).scale({0.1f, 0.1f, 0.1f})
+            });
+        }
 
         return s;
     }

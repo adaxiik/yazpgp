@@ -3,6 +3,7 @@ out vec4 frag_color;
 in vec3 vs_normal;
 in vec2 vs_texcoord;
 in vec3 world_position;
+in mat3 tbn_matrix;
 
 uniform sampler2D texture_0;
 uniform sampler2D texture_1;
@@ -191,11 +192,10 @@ uniform vec3 camera_position;
 uniform mat3 normal_matrix;
 
 void main () {
-    vec3 self_color = texture(texture_0, vs_texcoord).xyz;
+    vec3 self_color = texture(texture_0, vs_texcoord).rgb;
 
-    vec3 normal_rgb = normalize(texture(texture_1, vs_texcoord).rgb * 2.0f - 1.0f);
-    // vec3 normal = normalize(normal_matrix * vs_normal);
-    vec3 normal = normal_rgb;
+    vec3 normal_rgb = texture(texture_1, vs_texcoord).rgb * 2.0f - 1.0f;
+    vec3 normal = normalize(tbn_matrix * normal_rgb);
 
     vec3 view_direction = normalize(camera_position - world_position);
     vec3 light_color = all_lights(normal, view_direction, world_position);

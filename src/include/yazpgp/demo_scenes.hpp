@@ -16,4 +16,5 @@ namespace yazpgp::DemoScenes
     Scene normal_mapping(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders, const AssetStorage<Texture>& textures);
     Scene shell_texturing(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders, const AssetStorage<Texture>& textures);
     Scene terrain(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders, const AssetStorage<Texture>& textures);
+    Scene bezier_curve(const AssetStorage<Mesh>& meshes, const AssetStorage<Shader>& shaders);
 }

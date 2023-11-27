@@ -479,11 +479,15 @@ namespace yazpgp::DemoScenes
             .mesh = plane_mesh,
             .textures = {textures["grass"]},
             .transform = Transform::default_transform(),
-            .material = PhongBlinnMaterial::default_material(),
+            .material = PhongBlinnMaterial::create_shared(
+                glm::vec3(1.f),
+                glm::vec3(1.f),
+                glm::vec3(0.f)
+            ),
         }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
 
         s.add_light(
-            DirectionalLight().set_direction({0.f, -1.f, 1.f})
+            DirectionalLight().set_direction({0.f, -1.f, 0.f})
         );
 
         s.camera().move_up(3.f);

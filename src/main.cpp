@@ -1,12 +1,12 @@
 #include <yazpgp/application.hpp>
-int main(int argc, const char** argv)
+auto main() -> int
 {
-    yazpgp::Application app(
+    return yazpgp::Application(
         yazpgp::Application::ApplicationConfig{
             .title = "aaaaa",
             .width = 800,
             .height = 450
         }
-    );
-    return app.run();
+    )
+    .run();
 }

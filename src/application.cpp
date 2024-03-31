@@ -28,7 +28,7 @@
 #include "debug/debug_ui.hpp"
 #include "asset_storage.hpp"
 #include "demo_scenes.hpp"
-
+#include "bezier_list.hpp"
 namespace yazpgp
 {
     Application::Application(const ApplicationConfig& config)
@@ -268,7 +268,40 @@ namespace yazpgp
             }}
         );
         scenes[current_scene].invoke_distributors();
+
+        constexpr auto bezier_points = 4;
+        std::vector<glm::vec3> current_bezier_points;
+        BezierList<bezier_points> bezier_list;
+        Scene s;
+        s.add_entity(Scene::SceneRenderableEntity{
+            .shader = shaders["phong"],
+            .mesh = meshes["ball"],
+            .material = PhongBlinnMaterial::default_material(),
+            .transform_modifier = [&](const glm::mat4& m) {
+                static float dt = 0.f;
+                dt += 0.01f;
+
+                float t = std::sin(dt) * 0.5f + 0.5f;
+
+                glm::vec3 position = bezier_list(t);
+
+                return Transform::Mat4Compositor::Composite({
+                    Transform::Mat4Compositor::Translate(position),
+                })(m);
+            }
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_entity(Scene::SceneRenderableEntity{
+            .shader = shaders["phong_textured"],
+            .mesh = meshes["terrain"],
+            .textures = {textures["grass"]},
+            .material = PhongBlinnMaterial::default_material(),
+        }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader)
+        .add_light(DirectionalLight().set_direction({0.f, -1.f, 0.f}))
+        .set_skybox(skybox_forest)
+        .camera().move_up(5.f);
+        scenes.push_back(std::move(s));
         
+
         while (m_window->is_running())
         {
             auto& scene = scenes[current_scene];
@@ -296,8 +329,13 @@ namespace yazpgp
                 ImGui::End();
             }
 
+            if (entity_id_under_mouse > 0 and input_manager.get_key_down(Key::T) and not m_window->mouse_is_relative())
+            {
+                scene.entities().erase(scene.entities().begin() + entity_id_under_mouse - 1);
+            }
 
-            if (input_manager.get_key_down(Key::P))
+
+            if (input_manager.get_key_down(Key::P) or input_manager.get_key_down(Key::B))
             {
                 int x = input_manager.mouse_x();
                 int y = m_window->height() - input_manager.mouse_y();
@@ -307,13 +345,31 @@ namespace yazpgp
                 glm::vec4 viewport = glm::vec4(0, 0, m_window->width(), m_window->height());
                 auto unprojected = glm::unProject(screen_x, scene.camera().view_matrix(), projection_matrix, viewport);
 
-                scene.add_entity(Scene::SceneRenderableEntity{
-                    .shader = shaders["phong_textured"],
-                    .mesh = meshes["tree"],
-                    .textures = {textures["mad"]},
-                    .transform = Transform::default_transform().translate(unprojected),
-                    .material = PhongBlinnMaterial::default_material(),
-                }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+                if (input_manager.get_key_down(Key::P))
+                {
+                    scene.add_entity(Scene::SceneRenderableEntity{
+                        .shader = shaders["phong_textured"],
+                        .mesh = meshes["tree"],
+                        .textures = {textures["mad"]},
+                        .transform = Transform::default_transform().translate(unprojected),
+                        .material = PhongBlinnMaterial::default_material(),
+                    }, Scene::AddEntityOptions::PassLightToShader | Scene::AddEntityOptions::PassCameraPostitionToShader);
+                }
+
+                if (input_manager.get_key_down(Key::B))
+                {
+                    current_bezier_points.push_back(unprojected);
+                    if (current_bezier_points.size() % 4 == 0)
+                    {
+                        std::array<glm::vec3, bezier_points> points;
+                        for (size_t i = 0; i < bezier_points; i++)
+                            points[i] = current_bezier_points[i];
+                        
+                        bezier_list.add_curve(BezierCurve<bezier_points>(points));
+                        current_bezier_points.clear();
+                        current_bezier_points.push_back(unprojected);
+                    }
+                }
             }
 
             this->frame();

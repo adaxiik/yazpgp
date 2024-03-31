@@ -1,6 +1,16 @@
 # yazpgp
 Yet another ZPG project
 
+Nothing special.. it can render stuff..
+
+![models](examples/models.png)
+
+![light](examples/light.png)
+
+![grass](examples/grass.png)
+
+![curve](examples/curve.png)
+
 
 ## Libs
 - glm
